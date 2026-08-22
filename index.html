@@ -184,21 +184,26 @@ tailwind.config = {
   </div>
 </section>
 
-<!-- GARDEN -->
-<section id="garden" class="bg-ink text-paper mt-12 py-12">
+<!-- GARDEN — COMPACT DROPDOWN + LINEAR SCROLL -->
+<section id="garden" class="bg-ink text-paper mt-12 py-6">
   <div class="max-w-7xl mx-auto px-6">
-    <div class="flex flex-wrap justify-between gap-4 items-end">
+    <button onclick="toggleGarden()" class="w-full flex flex-wrap justify-between gap-4 items-center text-left group">
       <div>
-        <div class="text-sick font-mono text-xs tracking-[0.2em] flex items-center gap-2">MY GARDEN • YOUR COLLECTION <span id="syncStatus" class="bg-white/10 border border-white/20 text-paper/70 text-[10px] px-2 py-0.5 font-mono">○ Offline • local only</span></div>
-        <h3 class="text-[36px] font-black tracking-tighter mt-1">EVERY FOLD LIVES HERE<span class="text-sick">.</span></h3>
+        <div class="text-sick font-mono text-xs tracking-[0.2em] flex items-center gap-2">MY GARDEN • YOUR COLLECTION <span id="syncStatus" class="bg-white/10 border border-white/20 text-paper/70 text-[10px] px-2 py-0.5 font-mono">○ Offline • local only</span> <span id="gardenToggleIcon" class="bg-paper text-ink text-[10px] px-1.5 py-0.5 font-mono group-hover:bg-sick group-hover:text-white transition">▼ EXPAND</span></div>
+        <h3 class="text-[28px] font-black tracking-tighter mt-1">EVERY FOLD LIVES HERE<span class="text-sick">.</span> <span class="text-sm font-mono font-normal text-paper/50" id="gardenSummary">1/30 collected → tap to expand</span></h3>
       </div>
-      <div class="text-sm font-mono text-paper/60 max-w-[360px]">Folded origamis appear here as a zen garden. The more you fold, the calmer your garden becomes. <span class="text-sage">☁️ Synced via Neon</span> when logged in.</div>
-    </div>
-    <div id="gardenGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-8">
-      <!-- injected -->
-    </div>
-    <div id="emptyGarden" class="mt-6 border border-dashed border-paper/20 p-8 text-center font-mono text-sm text-paper/40">
-      Your garden is empty. Fold your first boat to plant a seed 🌱
+      <div class="hidden md:block text-sm font-mono text-paper/60 max-w-[360px]">Compact horizontal scroll — saves space. Tap to peek.</div>
+    </button>
+    <div id="gardenCollapsible" class="hidden mt-4">
+      <div id="gardenGrid" class="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scroll-smooth" style="scrollbar-width:thin;">
+        <!-- injected as horizontal cards -->
+      </div>
+      <div id="emptyGarden" class="hidden border border-dashed border-paper/20 p-6 text-center font-mono text-sm text-paper/40">
+        Your garden is empty. Fold your first boat to plant a seed 🌱
+      </div>
+      <div class="flex justify-between items-center mt-2 text-[10px] font-mono text-paper/40">
+        <span>← Scroll to see all 30 →</span><button onclick="toggleGarden()" class="underline">Collapse ▲</button>
+      </div>
     </div>
   </div>
 </section>

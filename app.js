@@ -469,21 +469,41 @@ function renderLevels() {
   });
 }
 
+let gardenOpen = false;
+function toggleGarden(){
+  gardenOpen = !gardenOpen;
+  const col=document.getElementById('gardenCollapsible');
+  const icon=document.getElementById('gardenToggleIcon');
+  const summary=document.getElementById('gardenSummary');
+  if(!col||!icon) return;
+  if(gardenOpen){ col.classList.remove('hidden'); icon.textContent='▲ COLLAPSE'; if(summary) summary.textContent='tap to collapse'; }
+  else { col.classList.add('hidden'); icon.textContent='▼ EXPAND'; if(summary) summary.textContent=`${progress.length}/30 collected → tap to expand`; }
+}
 function renderGarden() {
   const grid = document.getElementById('gardenGrid');
   const empty = document.getElementById('emptyGarden');
+  const summary=document.getElementById('gardenSummary');
   if (!grid || !empty) return;
+  if(summary) summary.textContent = `${progress.length}/30 collected → ${gardenOpen?'tap to collapse':'tap to expand'}`;
   grid.innerHTML = '';
-  if (progress.length===0) { empty.style.display='block'; grid.style.display='none'; return; }
-  empty.style.display='none'; grid.style.display='grid';
+  if (progress.length===0 && !gardenOpen) {
+    // keep collapsed view minimal: still hide grid, show hint inside collapsible only when opened
+    empty.style.display='none'; grid.style.display='none';
+    // if user opens, show empty
+    if(gardenOpen){ empty.classList.remove('hidden'); empty.style.display='block'; grid.style.display='none'; }
+    return;
+  }
+  if (progress.length===0) { empty.classList.remove('hidden'); empty.style.display='block'; grid.style.display='none'; return; }
+  empty.classList.add('hidden'); empty.style.display='none'; grid.style.display='flex';
   LEVELS.forEach(lvl => {
     const done = isCompleted(lvl.id);
     const div = document.createElement('div');
-    div.className = `border-2 ${done ? 'border-paper bg-white/10' : 'border-dashed border-paper/20 bg-transparent'} p-3 flex flex-col items-center gap-1 text-center`;
+    div.className = `shrink-0 snap-start border-2 ${done ? 'border-paper bg-white/10' : 'border-dashed border-paper/20 bg-transparent opacity-60'} w-[110px] p-3 flex flex-col items-center gap-1 text-center ${done?'cursor-pointer hover:bg-white/15 transition':''}`;
+    div.onclick = () => done && openModal(lvl.id);
     div.innerHTML = `
-      <div class="w-14 h-14 ${done ? 'bg-white' : 'bg-paper/5'} border border-paper/20 flex items-center justify-center text-2xl ${done ? '' : 'grayscale opacity-30'}">${done ? lvl.emoji : '?'}</div>
-      <div class="font-black text-[11px] tracking-widest leading-none">${lvl.title}</div>
-      <div class="text-[9px] font-mono ${done ? 'text-sage' : 'text-paper/40'}">${done ? 'COLLECTED' : 'LOCKED'} • ${lvl.sheets} PAPER</div>
+      <div class="w-12 h-12 ${done ? 'bg-white text-ink' : 'bg-paper/5 text-paper/40'} border border-paper/20 flex items-center justify-center text-xl ${done ? '' : 'grayscale'}">${done ? lvl.emoji : '?'}</div>
+      <div class="font-black text-[10px] tracking-widest leading-none">${lvl.title}</div>
+      <div class="text-[8px] font-mono ${done ? 'text-sage' : 'text-paper/40'}">${done ? 'COLLECTED' : 'LOCKED'} • ${lvl.sheets}</div>
     `;
     grid.appendChild(div);
   });
