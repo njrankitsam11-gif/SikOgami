@@ -31,3 +31,19 @@ export async function ensureUsersTable() {
   `;
   return true;
 }
+
+export async function ensureProgressTable() {
+  const s = getSql();
+  if (!s) return false;
+  await s`
+    CREATE TABLE IF NOT EXISTS sikogami_progress (
+      id SERIAL PRIMARY KEY,
+      user_id INT REFERENCES sikogami_users(id) ON DELETE CASCADE,
+      level_id INT NOT NULL,
+      completed_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(user_id, level_id)
+    )
+  `;
+  await s`CREATE INDEX IF NOT EXISTS idx_progress_user ON sikogami_progress(user_id)`;
+  return true;
+}

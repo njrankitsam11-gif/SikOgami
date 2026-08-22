@@ -335,6 +335,54 @@ function saveProgress() {
   localStorage.setItem('sikogami_progress', JSON.stringify(progress));
   updateProgressUI();
   renderGarden();
+  syncProgressToNeon();
+}
+async function syncProgressToNeon(){
+  const u=getCurrentUser();
+  if(!u || !u.email) return;
+  try{
+    await fetch('/api/progress',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email:u.email, progress})
+    });
+  }catch(e){ /* offline - local is source of truth */ }
+}
+async function loadProgressFromNeon(){
+  const u=getCurrentUser();
+  if(!u || !u.email) return;
+  try{
+    const r=await fetch(`/api/progress?email=${encodeURIComponent(u.email)}`);
+    const j=await r.json();
+    if(j.ok && Array.isArray(j.progress) && j.progress.length){
+      // merge: union of local + neon, prefer neon if larger
+      const merged = Array.from(new Set([...progress, ...j.progress])).sort((a,b)=>a-b);
+      // if neon has more, adopt neon; else push local to neon
+      if(j.progress.length > progress.length){
+        progress = j.progress.sort((a,b)=>a-b);
+        localStorage.setItem('sikogami_progress', JSON.stringify(progress));
+        updateProgressUI(); renderGarden(); renderLevels();
+        toast(`☁️ Synced ${progress.length} levels from Neon`);
+      } else if (merged.length > j.progress.length){
+        progress = merged;
+        localStorage.setItem('sikogami_progress', JSON.stringify(progress));
+        await syncProgressToNeon();
+      }
+    } else if (!progress.length && j.progress.length===0){
+      // first time user, nothing to sync
+    }
+  }catch(e){ /* offline */ }
+}
+async function syncSingleLevel(levelId){
+  const u=getCurrentUser();
+  if(!u || !u.email) return;
+  try{
+    await fetch('/api/progress',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email:u.email, levelId})
+    });
+  }catch(e){}
 }
 
 function isUnlocked(id) {
@@ -682,6 +730,8 @@ async function handleSignup(e){
         if(!users.find(u=>u.email===email)) { users.push({name,email,password:p,isAdmin:j.user.isAdmin}); setUsers(users); }
       }
       renderAuthArea(); renderLevels(); closeAuth();
+      // sync any local progress to new account
+      await syncProgressToNeon();
       toast(`Welcome ${name}! ${isAdmin()? '🔓 ADMIN — all levels unlocked + saved to Neon!': 'Account created — saved to Neon ✓'}`);
       return;
     } else {
@@ -713,7 +763,9 @@ async function handleLogin(e){
       } else {
         setCurrentUser(j.user);
       }
-      renderAuthArea(); renderLevels(); closeAuth();
+      renderAuthArea(); closeAuth();
+      await loadProgressFromNeon();
+      renderLevels();
       toast(`Welcome back ${getCurrentUser().name}! ${isAdmin()? '🔓 ADMIN — all 30 unlocked': 'Let\'s fold!'}`);
       return;
     } else {
@@ -823,8 +875,9 @@ function stopBreathing(){
   document.getElementById('breathingPaper').classList.remove('breathing');
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', async ()=>{
   updateProgressUI(); renderLevels(); renderGarden(); updateThemeIcon(); renderAuthArea();
+  if(getCurrentUser()) await loadProgressFromNeon();
   setInterval(()=>{
     const h=document.getElementById('heroOrigami');
     if(h) h.style.transform=`rotate(${Math.sin(Date.now()/800)*3}deg)`;
