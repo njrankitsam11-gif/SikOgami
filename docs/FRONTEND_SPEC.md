@@ -8,7 +8,7 @@
 - No build, script app.js at bottom.
 
 ## app.js (1032 lines)
-- LEVELS 30 objects (id,world,title,emoji,color,sheets,diff,unlocks,paperTip,steps 4-8). W1 1-6 single, W2 7-12 single, W3 13-18 2 papers, W4 19-24 modular, W5 25-30 master 12 max.
+- LEVELS 30 objects — deepened 8-10 steps each with svgType, SVG generator getStepSvg() (id,world,title,emoji,color,sheets,diff,unlocks,paperTip,steps 4-8). W1 1-6 single, W2 7-12 single, W3 13-18 2 papers, W4 19-24 modular, W5 25-30 master 12 max.
 - State: gardenOpen, gardenFilter all|collected|locked|single|multi, TOTAL 30, progress[], etc.
 - Auth helpers + Neon sync (saveProgress, syncProgressToNeon POST bulk, loadProgressFromNeon GET merge, setSyncStatus badge).
 - Levels: renderLevels grouped sticky, alternating side, status, sheetBadge, dot.

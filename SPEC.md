@@ -1,7 +1,7 @@
 # SikOgami — SPEC.md (Agent Source of Truth)
 > **Read this first every session. Update after each module/feature.**
 > Location: `/Users/sam/Desktop/SikOgami/SPEC.md`
-> Last Updated: 2026-08-22 | Version: 1.0.0 | Deployment: https://sikogami.vercel.app
+> Last Updated: 2026-08-22 | Version: 1.9.0 | Deployment: https://sikogami.vercel.app
 
 ## 0. Agent Instructions
 - **At session start:** Read `SPEC.md` + `docs/API_SPEC.md` + `docs/DB_SPEC.md` before any code.
@@ -53,7 +53,7 @@ index.html (SPA shell, Tailwind CDN)
 - `/Users/sam/Desktop/SikOgami/vercel.json`
 - `/Users/sam/Desktop/SikOgami/SPEC.md` (this file) + `docs/*`
 
-## 5. Levels (30, Source of Truth `app.js:2` LEVELS)
+## 5. Levels (30, Deepened 8-10 micro-steps SVG, Source of Truth `app.js:2` LEVELS)
 **Structure:** `{id 1-30, world, title UPPER, subtitle, emoji, color hex, sheets 1-12, diff "DIFF • min • N PAPER", unlocks, paperTip, steps: [{title, desc, emoji, visual}] 4-8 steps}`
 - **W1 THE CALM SHORE (1-6, 1 PAPER, BEGINNER):** 1 Boat 8 steps (perfect see app.js:5-16) → 2 Cup 5 → 3 Tulip 4 → 4 Whale 4 → 5 Dog Face 4 → 6 Heart 4
 - **W2 THE QUIET FOREST (7-12, 1 PAPER, EASY/MEDIUM):** 7 Butterfly → 8 Fox Face → 9 Jumping Frog → 10 Crane (bird base, 12min) → 11 Fish → 12 Penguin
@@ -152,6 +152,7 @@ Client mirror: `sikogami_progress` sorted int[]; `is_admin` drives admin unlock.
 - **2026-08-22 v1.5.0:** Garden compact dropdown `▼ EXPAND` + horizontal snap `flex` + stats + filters + sync badge dark fix.
 - **2026-08-22 v1.6.0:** Garden glow-up filters `all/collected/locked/single/multi` + stats `statCollected/Worlds/Papers` + 118px cards.
 - **2026-08-22 v1.7.0:** Garden dropdown indicator obvious `▼ EXPAND` pill + dashed border + rotating chevron.
+- **2026-08-22 v1.9.0:** Deepened paper crafting — SVG dotted valley/mountain system, 8-10 micro-steps per level (L1 10), CraftPlayer with stepSvg + svgHint, auto-expander for 4→8 (`dpl_5a1ixU75`)
 - **2026-08-22 v1.8.0:** Zen immersive `zen-bg` light/dark fix, timer `00:00`, pattern `4-6/4-4/4-7-8`, play/pause, quotes, sound mock.
 
 ## 15. How to Update Spec After Each Module
