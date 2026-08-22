@@ -337,41 +337,52 @@ function saveProgress() {
   renderGarden();
   syncProgressToNeon();
 }
+function setSyncStatus(text, colorClass){
+  const el=document.getElementById('syncStatus');
+  if(!el) return;
+  el.textContent=text;
+  el.className='text-[10px] px-2 py-0.5 font-mono border '+colorClass;
+}
 async function syncProgressToNeon(){
   const u=getCurrentUser();
-  if(!u || !u.email) return;
+  if(!u || !u.email) { setSyncStatus('○ Offline • local only','bg-white/10 border-white/20 text-paper/70'); return; }
+  setSyncStatus('◍ Syncing...','bg-sage/20 border-sage text-sage');
   try{
-    await fetch('/api/progress',{
+    const r=await fetch('/api/progress',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({email:u.email, progress})
     });
-  }catch(e){ /* offline - local is source of truth */ }
+    const j=await r.json();
+    if(j.ok) setSyncStatus(`☁️ Neon synced • ${progress.length}/30`,'bg-[#22c55e]/20 border-[#22c55e] text-[#86efac]');
+    else setSyncStatus('⚠︎ Sync failed','bg-sick/20 border-sick text-white');
+  }catch(e){ setSyncStatus('○ Offline • local only','bg-white/10 border-white/20 text-paper/70'); }
 }
 async function loadProgressFromNeon(){
   const u=getCurrentUser();
-  if(!u || !u.email) return;
+  if(!u || !u.email) { setSyncStatus('○ Offline • local only','bg-white/10 border-white/20 text-paper/70'); return; }
+  setSyncStatus('◍ Syncing...','bg-sage/20 border-sage text-sage');
   try{
     const r=await fetch(`/api/progress?email=${encodeURIComponent(u.email)}`);
     const j=await r.json();
-    if(j.ok && Array.isArray(j.progress) && j.progress.length){
-      // merge: union of local + neon, prefer neon if larger
-      const merged = Array.from(new Set([...progress, ...j.progress])).sort((a,b)=>a-b);
-      // if neon has more, adopt neon; else push local to neon
-      if(j.progress.length > progress.length){
-        progress = j.progress.sort((a,b)=>a-b);
-        localStorage.setItem('sikogami_progress', JSON.stringify(progress));
-        updateProgressUI(); renderGarden(); renderLevels();
-        toast(`☁️ Synced ${progress.length} levels from Neon`);
-      } else if (merged.length > j.progress.length){
-        progress = merged;
-        localStorage.setItem('sikogami_progress', JSON.stringify(progress));
-        await syncProgressToNeon();
+    if(j.ok){
+      if(Array.isArray(j.progress) && j.progress.length){
+        const merged = Array.from(new Set([...progress, ...j.progress])).sort((a,b)=>a-b);
+        if(j.progress.length > progress.length){
+          progress = j.progress.sort((a,b)=>a-b);
+          localStorage.setItem('sikogami_progress', JSON.stringify(progress));
+          updateProgressUI(); renderGarden(); renderLevels();
+          toast(`☁️ Synced ${progress.length} levels from Neon`);
+        } else if (merged.length > j.progress.length){
+          progress = merged;
+          localStorage.setItem('sikogami_progress', JSON.stringify(progress));
+          await syncProgressToNeon();
+          setSyncStatus(`☁️ Neon synced • ${progress.length}/30`,'bg-[#22c55e]/20 border-[#22c55e] text-[#86efac]'); return;
+        }
       }
-    } else if (!progress.length && j.progress.length===0){
-      // first time user, nothing to sync
-    }
-  }catch(e){ /* offline */ }
+      setSyncStatus(`☁️ Neon synced • ${progress.length}/30`,'bg-[#22c55e]/20 border-[#22c55e] text-[#86efac]');
+    } else setSyncStatus('⚠︎ Sync failed','bg-sick/20 border-sick text-white');
+  }catch(e){ setSyncStatus('○ Offline • local only','bg-white/10 border-white/20 text-paper/70'); }
 }
 async function syncSingleLevel(levelId){
   const u=getCurrentUser();
