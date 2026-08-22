@@ -657,48 +657,110 @@ function showErr(id,msg){
   el.textContent=msg; el.classList.remove('hidden');
   setTimeout(()=>el.classList.add('hidden'),4000);
 }
-function handleSignup(e){
+async function handleSignup(e){
   e.preventDefault();
   const name=document.getElementById('signupName').value.trim();
   const email=document.getElementById('signupEmail').value.trim().toLowerCase();
   const p=document.getElementById('signupPass').value;
   const p2=document.getElementById('signupPass2').value;
   if(p!==p2) return showErr('signupErr','Passwords do not match');
-  let users=getUsers();
-  if(users.find(u=>u.email===email)) return showErr('signupErr','Email already exists — try Login');
-  const isAdminEmail = email==='admin@sikogami.com';
-  const user={name,email,password:p,isAdmin:isAdminEmail};
-  users.push(user); setUsers(users);
-  setCurrentUser(user);
-  renderAuthArea(); renderLevels(); closeAuth();
-  toast(`Welcome ${name}! ${isAdminEmail? '🔓 ADMIN — all levels unlocked!': 'Account created — start folding!'}`);
+  // try Neon first
+  try{
+    const r=await fetch('/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:p})});
+    const j=await r.json();
+    if(r.ok && j.ok){
+      if(j.fallback){
+        // no DB yet -> local fallback
+        let users=getUsers();
+        if(users.find(u=>u.email===email)) return showErr('signupErr','Email already exists — try Login');
+        const user={name,email,password:p,isAdmin:email==='admin@sikogami.com'};
+        users.push(user); setUsers(users); setCurrentUser(user);
+      } else {
+        setCurrentUser(j.user);
+        // mirror to local for offline
+        let users=getUsers();
+        if(!users.find(u=>u.email===email)) { users.push({name,email,password:p,isAdmin:j.user.isAdmin}); setUsers(users); }
+      }
+      renderAuthArea(); renderLevels(); closeAuth();
+      toast(`Welcome ${name}! ${isAdmin()? '🔓 ADMIN — all levels unlocked + saved to Neon!': 'Account created — saved to Neon ✓'}`);
+      return;
+    } else {
+      return showErr('signupErr', j.error || 'Signup failed');
+    }
+  }catch(err){
+    // offline fallback
+    let users=getUsers();
+    if(users.find(u=>u.email===email)) return showErr('signupErr','Email already exists — try Login');
+    const user={name,email,password:p,isAdmin:email==='admin@sikogami.com'};
+    users.push(user); setUsers(users); setCurrentUser(user);
+    renderAuthArea(); renderLevels(); closeAuth();
+    toast(`Welcome ${name}! (offline mode)`);
+  }
 }
-function handleLogin(e){
+async function handleLogin(e){
   e.preventDefault();
   const email=document.getElementById('loginEmail').value.trim().toLowerCase();
   const p=document.getElementById('loginPass').value;
-  const users=getUsers();
-  const u=users.find(x=>x.email===email && x.password===p);
-  if(!u) return showErr('loginErr','Wrong email or password');
-  setCurrentUser(u);
-  renderAuthArea(); renderLevels(); closeAuth();
-  toast(`Welcome back ${u.name}! ${isAdmin()? '🔓 ADMIN — all 30 unlocked': 'Let\'s fold!'}`);
+  try{
+    const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:p})});
+    const j=await r.json();
+    if(r.ok && j.ok){
+      if(j.fallback){
+        const users=getUsers();
+        const u=users.find(x=>x.email===email && x.password===p);
+        if(!u) return showErr('loginErr','Wrong email or password (offline)');
+        setCurrentUser(u);
+      } else {
+        setCurrentUser(j.user);
+      }
+      renderAuthArea(); renderLevels(); closeAuth();
+      toast(`Welcome back ${getCurrentUser().name}! ${isAdmin()? '🔓 ADMIN — all 30 unlocked': 'Let\'s fold!'}`);
+      return;
+    } else {
+      return showErr('loginErr', j.error || 'Login failed');
+    }
+  }catch(err){
+    const users=getUsers();
+    const u=users.find(x=>x.email===email && x.password===p);
+    if(!u) return showErr('loginErr','Wrong email or password');
+    setCurrentUser(u); renderAuthArea(); renderLevels(); closeAuth();
+    toast(`Welcome back ${u.name}! (offline)`);
+  }
 }
-function handleForgot(e){
+async function handleForgot(e){
   e.preventDefault();
   const email=document.getElementById('forgotEmail').value.trim().toLowerCase();
   const np=document.getElementById('forgotPass').value;
-  let users=getUsers();
-  const idx=users.findIndex(u=>u.email===email);
   const el=document.getElementById('forgotErr');
-  if(idx===-1){ el.className='text-xs font-mono p-2 border bg-sick/10 border-sick text-sick'; el.textContent='No account with that email'; el.classList.remove('hidden'); return; }
-  users[idx].password=np; setUsers(users);
-  // if current user is this email, update session
-  const cur=getCurrentUser();
-  if(cur && cur.email===email) setCurrentUser(users[idx]);
-  el.className='text-xs font-mono p-2 border bg-[#22c55e]/10 border-[#22c55e] text-[#166534]'; el.textContent='✓ Password reset! Now login with new password.'; el.classList.remove('hidden');
-  setTimeout(()=> switchAuth('login'),1500);
-  toast('Password reset ✓');
+  try{
+    const r=await fetch('/api/auth/forgot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,newPassword:np})});
+    const j=await r.json();
+    if(r.ok && j.ok){
+      if(j.fallback){
+        // local fallback
+        let users=getUsers();
+        const idx=users.findIndex(u=>u.email===email);
+        if(idx===-1){ el.className='text-xs font-mono p-2 border bg-sick/10 border-sick text-sick'; el.textContent='No account with that email (offline)'; el.classList.remove('hidden'); return; }
+        users[idx].password=np; setUsers(users);
+        const cur=getCurrentUser(); if(cur && cur.email===email) setCurrentUser(users[idx]);
+      }
+      el.className='text-xs font-mono p-2 border bg-[#22c55e]/10 border-[#22c55e] text-[#166534]'; el.textContent=j.fallback?'✓ Password reset (offline) — now login':'✓ Password reset in Neon! Now login.'; el.classList.remove('hidden');
+      setTimeout(()=> switchAuth('login'),1500);
+      toast('Password reset ✓');
+      return;
+    } else {
+      el.className='text-xs font-mono p-2 border bg-sick/10 border-sick text-sick'; el.textContent=j.error||'Reset failed'; el.classList.remove('hidden'); return;
+    }
+  }catch(err){
+    let users=getUsers();
+    const idx=users.findIndex(u=>u.email===email);
+    if(idx===-1){ el.className='text-xs font-mono p-2 border bg-sick/10 border-sick text-sick'; el.textContent='No account with that email'; el.classList.remove('hidden'); return; }
+    users[idx].password=np; setUsers(users);
+    const cur=getCurrentUser(); if(cur && cur.email===email) setCurrentUser(users[idx]);
+    el.className='text-xs font-mono p-2 border bg-[#22c55e]/10 border-[#22c55e] text-[#166534]'; el.textContent='✓ Password reset! (offline) Now login.'; el.classList.remove('hidden');
+    setTimeout(()=> switchAuth('login'),1500);
+    toast('Password reset ✓');
+  }
 }
 function handleLogout(){
   setCurrentUser(null);

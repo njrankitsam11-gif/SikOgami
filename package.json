@@ -5,5 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 8000"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "bcryptjs": "^3.0.3"
   }
 }
