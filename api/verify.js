@@ -18,12 +18,36 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
     const target = levelTitle || `LEVEL ${levelId}`;
     const expectedMap = {
-      1: "a paper boat / origami boat",
-      2: "a paper airplane / paper plane",
-      3: "an origami tulip flower",
-      4: "an origami butterfly",
-      5: "an origami fox face",
-      6: "an origami jumping frog"
+      1: "a paper boat / origami boat (single sheet, 8 precise folds, hull open)",
+      2: "a paper cup / origami cup",
+      3: "an origami tulip bloom (single sheet)",
+      4: "an origami whale",
+      5: "an origami dog face",
+      6: "an origami heart",
+      7: "an origami butterfly",
+      8: "an origami fox face",
+      9: "an origami jumping frog",
+      10: "an origami crane bird",
+      11: "an origami fish",
+      12: "an origami penguin",
+      13: "an origami tulip with stem (2 papers: flower + stem)",
+      14: "an origami boat with sail (2 papers)",
+      15: "two origami butterflies / butterfly garden (2 papers)",
+      16: "two origami fox faces / fox family (2 papers, parent + kit)",
+      17: "two origami frogs / frog pond (2 papers)",
+      18: "two origami cranes / crane couple (2 papers)",
+      19: "an origami modular cube (6 sheets)",
+      20: "an origami ninja star shuriken (2 papers)",
+      21: "an origami 5-point star (5 papers)",
+      22: "an origami kusudama flower ball (5 papers)",
+      23: "origami samurai helmet + sword (2 papers)",
+      24: "three origami boats / boat fleet (3 papers)",
+      25: "an origami dragon (single sheet master)",
+      26: "an origami peacock with fan tail (2 papers)",
+      27: "an origami elephant",
+      28: "origami samurai armor with helmet and sword (3 papers)",
+      29: "an origami lotus garden with 6 lotus on pond (7 papers)",
+      30: "an origami castle / sikogami castle modular (12 papers)"
     };
     const expected = expectedMap[levelId] || target;
 

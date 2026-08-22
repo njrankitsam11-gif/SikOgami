@@ -30,6 +30,10 @@ tailwind.config = {
 </script>
 <link rel="stylesheet" href="style.css">
 </head>
+<script>
+// theme init before paint
+(function(){ const t=localStorage.getItem('sikogami_theme')|| (window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); document.documentElement.classList.toggle('dark', t==='dark'); })();
+</script>
 <body class="bg-paper text-ink font-display antialiased overflow-x-hidden">
 
 <!-- Paper Texture Overlay -->
@@ -44,9 +48,10 @@ tailwind.config = {
       <span class="hidden md:inline-flex ml-3 text-[10px] font-mono tracking-[0.2em] bg-ink text-paper px-2 py-1">BETA • RELAX PROTOCOL</span>
     </div>
     <div class="flex items-center gap-2 md:gap-4">
+      <button onclick="toggleTheme()" id="themeBtn" class="w-9 h-9 border-2 border-ink flex items-center justify-center text-sm hover:bg-ink hover:text-paper transition" title="Toggle Dark/Light">🌙</button>
       <button onclick="toggleZen()" id="zenBtn" class="hidden md:flex items-center gap-2 text-xs font-mono tracking-widest border border-ink px-4 py-2 hover:bg-ink hover:text-paper transition">○ ZEN MODE</button>
       <button onclick="scrollToGarden()" class="flex items-center gap-2 bg-ink text-paper px-4 py-2 text-xs font-mono tracking-widest">
-        MY GARDEN <span id="gardenCount" class="bg-sick px-1.5 py-0.5 text-white">0/6</span>
+        MY GARDEN <span id="gardenCount" class="bg-sick px-1.5 py-0.5 text-white">0/30</span>
       </button>
     </div>
   </div>
@@ -156,12 +161,12 @@ tailwind.config = {
 <section id="levels" class="max-w-7xl mx-auto px-6 py-10">
   <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
     <div>
-      <div class="text-[11px] font-mono tracking-[0.2em] text-sick font-bold">THE JOURNEY • 6 LEVELS • 2 WORLDS</div>
+      <div class="text-[11px] font-mono tracking-[0.2em] text-sick font-bold">THE JOURNEY • 30 LEVELS • 5 WORLDS</div>
       <h2 class="text-[42px] font-black tracking-tighter leading-none mt-1">YOUR PATH TO MASTER<span class="font-serif italic font-normal">.</span></h2>
     </div>
     <div class="text-right">
       <div class="text-[11px] font-mono tracking-widest text-ink/60">PROGRESS</div>
-      <div class="font-black text-2xl"><span id="progressText">0</span>/6 COMPLETED</div>
+      <div class="font-black text-2xl"><span id="progressText">0</span>/30 COMPLETED</div>
       <div class="w-[160px] h-2 bg-ink/10 mt-1 overflow-hidden"><div id="progressBar" class="h-full bg-sick transition-all duration-700" style="width:0%"></div></div>
     </div>
   </div>
@@ -287,7 +292,7 @@ tailwind.config = {
       <div class="flex items-center gap-3">
         <div id="modalLevelBadge" class="w-10 h-10 bg-ink text-paper flex items-center justify-center font-black">1</div>
         <div>
-          <div id="modalTitle" class="font-black text-lg leading-none">PAPER BOAT</div>
+          <div class="flex items-center gap-2"><div id="modalTitle" class="font-black text-lg leading-none">PAPER BOAT</div><span id="sheetLabel" class="text-[10px] font-mono bg-sick text-white px-1.5 py-0.5">1 SHEET</span></div>
           <div id="modalWorld" class="text-[11px] font-mono tracking-widest text-ink/60">WORLD 1 • THE CALM SHORE</div>
         </div>
       </div>
@@ -298,7 +303,7 @@ tailwind.config = {
       <!-- Left: Steps -->
       <div class="p-6 border-r-2 border-ink/10">
         <div class="flex justify-between items-center">
-          <div class="text-[11px] font-mono tracking-widest">STEP <span id="stepNum">1</span> / <span id="stepTotal">4</span></div>
+          <div class="text-[11px] font-mono tracking-widest">STEP <span id="stepNum">1</span> / <span id="stepTotal">8</span> <span id="stepHint" class="text-ink/50 ml-2 hidden md:inline">1 paper • Step 1/8</span></div>
           <div class="flex gap-1" id="stepDots"></div>
         </div>
         <!-- Visual -->
