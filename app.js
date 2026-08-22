@@ -91,13 +91,19 @@ const LEVELS = [
   },
   // WORLD 2: THE QUIET FOREST — Single Sheet Easy-Medium (7-12)
   {
-    id:7, world:"WORLD 2 • THE QUIET FOREST", title:"BUTTERFLY", subtitle:"Wings spread — still one sheet", emoji:"🦋", color:"#C9A8FF",
-    sheets:1, diff:"EASY • 7 min • 1 PAPER", unlocks:"Unlocks Fox", paperTip:"ONE vibrant duo-color sheet. Orange+Yellow pops beautifully.",
+    id:7, world:"WORLD 2 • THE QUIET FOREST", title:"BUTTERFLY", subtitle:"Wings spread — traditional 15→10 micro-steps", emoji:"🦋", color:"#C9A8FF",
+    sheets:1, diff:"EASY • 10 min • 1 PAPER", unlocks:"Unlocks Fox", paperTip:"ONE 6×6in Kami or 3×3in Chiyogami patterned. Duo shows wing contrast. Single sheet.",
     steps:[
-      {title:"Square to Kite", desc:"Fold kite base, then unfold side flaps — guideline creases set.", emoji:"🪁", visual:"Kite with guide creases"},
-      {title:"Squash Wings", desc:"Lift top layers, squash flat — wings puff. Gentle, let paper breathe.", emoji:"🦋", visual:"Wings squashed, raised"},
-      {title:"Body Fold", desc:"Fold in half mountain-wise, then shape wings with soft curves.", emoji:"✨", visual:"Half fold, wings angled"},
-      {title:"Rest", desc:"Balance on fingertip — one-paper butterfly ready to land.", emoji:"🦋", visual:"Butterfly poised"},
+      {title:"Place White Up", desc:"White side UP, 15cm. Fold in half horizontally → UNFOLD, then vertically → UNFOLD. Cross guides. Smooth.", emoji:"📄", visual:"Square with cross creases", svgType:"valley-h-unfold"},
+      {title:"Turn Over", desc:"TURN OVER ↺ white→color. Now color up for diagonals.", emoji:"↺", visual:"Turn over, color up", svgType:"turn-over"},
+      {title:"Diagonals X", desc:"Fold both diagonals valley, crease, UNFOLD. X appears. Keep color up.", emoji:"✚", visual:"X diagonals faint", svgType:"valley-diag-unfold"},
+      {title:"Blintz Corners", desc:"Fold all 4 corners to center point. Watch intersect on cross lines, not just center. Four small triangles meet.", emoji:"🔶", visual:"Blintz - corners to center", svgType:"tuck-corners"},
+      {title:"Turn Again", desc:"TURN OVER ↺ blintz side down. Color now hidden under flaps.", emoji:"↺", visual:"Turn over blintz", svgType:"turn-over"},
+      {title:"Sides to Center", desc:"Fold left and right edges to vertical centerline. Use existing creases as guide. Crease well.", emoji:"📐", visual:"Sides to center, narrow rectangle", svgType:"valley-v"},
+      {title:"Collapse", desc:"Collapse along existing creases: bring left/right edges to center, top edge down. Paper snaps into layered shape. Press flat.", emoji:"📦", visual:"Collapsed layered shape", svgType:"squash-diamond"},
+      {title:"Push Bottom Up", desc:"Push bottom edge UP along crease, corners shift outward. Bottom layer lifts. Valley fold.", emoji:"⬆️", visual:"Bottom pushed up, corners out", svgType:"valley-h-flap"},
+      {title:"Mountain Top Back", desc:"Mountain fold top section BACKWARD behind model. Hidden valley front. Tuck.", emoji:"↩️", visual:"Top folded behind", svgType:"mountain-h"},
+      {title:"Wings & Spread", desc:"Fold top flap left→right, then right, to narrow body. Fold in half left→right, then lift wings. Spread and curl. Butterfly final!", emoji:"🦋", visual:"Wings spread, butterfly", svgType:"butterfly-final"},
     ]
   },
   {
