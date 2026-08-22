@@ -406,16 +406,20 @@ function isCompleted(id) { return progress.includes(id); }
 const TOTAL = LEVELS.length;
 
 // ——— SVG GENERATOR — SHAPE-ACCURATE MORPH ———
-function getStepSvg(type, finalType){
+function getStepSvg(type, finalType, paperOverride){
   // Ghost final preview when not at final step
   let ghost="";
+  // Use level's real paper color if provided
+  const levelPaper = paperOverride || "#FFF8E7";
   if(finalType && finalType!==type && finalType.includes("final")){
     // draw faint final outline behind: use same maps but at low opacity
     const paperGhost="#FFF8E7";
     // we will let caller handle ghost via extra layer, but for now just add hint text
     ghost=`<text x="50" y="95" text-anchor="middle" font-family="monospace" font-size="4" fill="#999" opacity="0.6">→ ${finalType.replace("-final","").toUpperCase()} </text>`;
   }
-  const paper="#FFF8E7", paperBack="#F0E6D3", stroke="#0A0A0A", red="#FF3B30", blue="#1E40AF", sage="#A8D5BA", shadow="rgba(0,0,0,0.08)";
+  const paper=levelPaper, paperBack=levelPaper==="#FFF8E7"?"#F0E6D3":levelPaper+"AA";
+  const isDark = (hex)=>{ try{hex=hex.replace("#","");const r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);return (0.299*r+0.587*g+0.114*b)/255 < 0.5;}catch{return false;}};
+  const stroke=isDark(paper)?"#FDFBF7":"#0A0A0A", red="#FF3B30", blue="#60A5FA", sage="#A8D5BA", shadow=isDark(paper)?"rgba(255,255,255,0.15)":"rgba(0,0,0,0.08)";
   const base = (shapePath, lines) => `<svg viewBox="0 0 100 100" class="w-full h-full"><rect x="0" y="0" width="100" height="100" rx="2" fill="${paper}" opacity="0.15"/><g filter="url(#sh)">${shapePath}</g>${lines || ""}<defs><filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="0.8" flood-opacity="0.12"/></filter></defs></svg>`;
   const sq = `<rect x="12" y="12" width="76" height="76" rx="1.2" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/>`;
   const maps = {
@@ -444,8 +448,8 @@ function getStepSvg(type, finalType){
     "butterfly-final": base(`<path d="M50 30 Q30 45 20 55 Q30 65 50 50 M50 30 Q70 45 80 55 Q70 65 50 50" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><line x1="50" y1="30" x2="50" y2="55" stroke="${stroke}" stroke-width="0.8"/>`),
     "crane-final": base(`<path d="M35 65 L50 30 L65 65 M50 30 L35 45 M50 30 L65 45 M35 65 Q50 75 65 65" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M50 30 L48 22" stroke="${stroke}" stroke-width="0.9"/>`),
     "frog-final": base(`<ellipse cx="50" cy="60" rx="22" ry="14" fill="${paper}" stroke="${stroke}"/><ellipse cx="35" cy="70" rx="7" ry="9" fill="${paper}" stroke="${stroke}"/><ellipse cx="65" cy="70" rx="7" ry="9" fill="${paper}" stroke="${stroke}"/><circle cx="42" cy="50" r="2" fill="${stroke}"/><circle cx="58" cy="50" r="2" fill="${stroke}"/>`),
-    "tulip-final": base(`<path d="M50 30 Q35 45 38 60 Q50 70 62 60 Q65 45 50 30" fill="#FF6B6B" stroke="${stroke}" stroke-width="1"/><path d="M50 70 L50 85" stroke="#22c55e" stroke-width="1.5"/>`),
-    "fox-final": base(`<path d="M50 22 L20 50 L28 72 L72 72 L80 50 Z" fill="#FB923C" stroke="${stroke}" stroke-width="1.1"/><polygon points="20,50 30,35 28,50" fill="white" stroke="${stroke}"/><polygon points="80,50 70,35 72,50" fill="white" stroke="${stroke}"/><ellipse cx="50" cy="62" rx="3" ry="2.5" fill="white" stroke="${stroke}"/>`),
+    "tulip-final": base(`<path d="M50 30 Q35 45 38 60 Q50 70 62 60 Q65 45 50 30" fill="${paper}" stroke="${stroke}" stroke-width="1"/><path d="M50 70 L50 85" stroke="#22c55e" stroke-width="1.5"/>`),
+    "fox-final": base(`<path d="M50 22 L20 50 L28 72 L72 72 L80 50 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><polygon points="20,50 30,35 28,50" fill="white" stroke="${stroke}"/><polygon points="80,50 70,35 72,50" fill="white" stroke="${stroke}"/><ellipse cx="50" cy="62" rx="3" ry="2.5" fill="white" stroke="${stroke}"/>`),
     "fish-final": base(`<path d="M15 50 Q30 30 50 50 Q30 70 15 50 M70 40 Q60 50 70 60" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><circle cx="35" cy="48" r="1.5" fill="${stroke}"/>`),
     "penguin-final": base(`<ellipse cx="50" cy="55" rx="18" ry="24" fill="${stroke}" stroke="${stroke}"/><ellipse cx="50" cy="65" rx="10" ry="12" fill="white"/><polygon points="50,45 46,50 54,50" fill="#FFB000" stroke="${stroke}"/>`),
     "cube-final": base(`<path d="M30 30 L60 30 L75 45 L75 70 L45 70 L30 55 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M30 30 L45 45 L75 45 L60 30" fill="${paperBack}" stroke="${stroke}"/><path d="M45 45 L45 70" stroke="${stroke}" opacity="0.5"/>`),
@@ -698,7 +702,7 @@ function renderStep() {
   document.getElementById('stepEmoji').textContent = step.emoji;
   document.getElementById('stepEmoji').style.transform = `rotate(${currentStep*2}deg)`;
   document.getElementById('stepVisual').textContent = step.visual;
-  const svgContainer=document.getElementById('stepSvg'); if(svgContainer){ const stepsAll=currentLevel._detailed||currentLevel.steps; const finalType=stepsAll[stepsAll.length-1].svgType; svgContainer.innerHTML=getStepSvg(step.svgType||'paper-flat', finalType); svgContainer.style.opacity='0'; setTimeout(()=>svgContainer.style.opacity='1', 50); }
+  const svgContainer=document.getElementById('stepSvg'); if(svgContainer){ const stepsAll=currentLevel._detailed||currentLevel.steps; const finalType=stepsAll[stepsAll.length-1].svgType; const paperCol=currentLevel.color||"#FFF8E7"; svgContainer.innerHTML=getStepSvg(step.svgType||'paper-flat', finalType, paperCol); svgContainer.style.opacity='0'; setTimeout(()=>svgContainer.style.opacity='1', 50); }
   const svgHintEl=document.getElementById('svgHint'); if(svgHintEl){ const tt=step.svgType||''; svgHintEl.textContent = tt.includes('turn')? '↺ TURN OVER — flip': tt.includes('unfold')? 'CREASE WELL, THEN UNFOLD': tt.includes('mountain')? 'MOUNTAIN (blue) — behind': tt.includes('valley')? 'VALLEY (red) — forward': 'FOLLOW RED/BLUE DOTTED LINES'; }
   const lbl=document.getElementById('stepSvgLabel'); if(lbl){ lbl.textContent = (step.svgType||'VALLEY').replace('-',' ').toUpperCase(); }
   const morph=document.getElementById('morphBar'); if(morph){ const stepsAll2=currentLevel._detailed||currentLevel.steps; const pct=Math.round((currentStep+1)/stepsAll2.length*100); morph.style.width=pct+'%'; morph.textContent=pct+'%'; }
