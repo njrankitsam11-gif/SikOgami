@@ -1,0 +1,9 @@
+{
+  "name": "sikogami",
+  "version": "1.0.0",
+  "description": "SikOgami — Fold. Breathe. Level Up. Interactive origami zen game",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8000"
+  }
+}

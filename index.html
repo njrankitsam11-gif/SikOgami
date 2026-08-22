@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SikOgami — Fold. Breathe. Level Up.</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['Bricolage Grotesque', 'sans-serif'],
+        serif: ['Instrument Serif', 'serif'],
+        mono: ['Space Mono', 'monospace'],
+      },
+      colors: {
+        paper: '#FDFBF7',
+        ink: '#0A0A0A',
+        sick: '#FF3B30',
+        sage: '#A8D5BA',
+        sand: '#F0E6D3',
+        cream: '#FFF8E7',
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-paper text-ink font-display antialiased overflow-x-hidden">
+
+<!-- Paper Texture Overlay -->
+<div class="paper-texture"></div>
+
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-paper/80 backdrop-blur-xl border-b border-ink/10">
+  <div class="max-w-7xl mx-auto px-6 h-[64px] flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-ink text-paper flex items-center justify-center font-black text-[18px] tracking-tighter">折</div>
+      <span class="font-black text-[22px] tracking-tighter">Sik<span class="font-light">Ogami</span><span class="text-sick">.</span></span>
+      <span class="hidden md:inline-flex ml-3 text-[10px] font-mono tracking-[0.2em] bg-ink text-paper px-2 py-1">BETA • RELAX PROTOCOL</span>
+    </div>
+    <div class="flex items-center gap-2 md:gap-4">
+      <button onclick="toggleZen()" id="zenBtn" class="hidden md:flex items-center gap-2 text-xs font-mono tracking-widest border border-ink px-4 py-2 hover:bg-ink hover:text-paper transition">○ ZEN MODE</button>
+      <button onclick="scrollToGarden()" class="flex items-center gap-2 bg-ink text-paper px-4 py-2 text-xs font-mono tracking-widest">
+        MY GARDEN <span id="gardenCount" class="bg-sick px-1.5 py-0.5 text-white">0/6</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="pt-[64px] relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-8 py-10 lg:py-16 items-center">
+    <!-- Left -->
+    <div class="lg:col-span-7 relative">
+      <div class="inline-flex items-center gap-2 bg-sage/30 border border-ink/10 px-3 py-1.5 text-[11px] font-mono tracking-widest">
+        <span class="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse"></span> NO STRESS • JUST FOLDS • LEVEL 1 → ∞
+      </div>
+      <h1 class="mt-6 text-[48px] md:text-[72px] lg:text-[84px] font-black leading-[0.85] tracking-tighter">
+        FOLD.<br>
+        BREATHE.<br>
+        <span class="relative inline-block">LEVEL<span class="text-sick">_</span>UP.
+          <span class="absolute -right-8 -top-2 text-[14px] font-mono font-normal bg-sick text-white px-2 py-1 rotate-3">SICK!</span>
+        </span>
+      </h1>
+      <p class="mt-6 text-[17px] leading-relaxed text-ink/70 max-w-[520px] font-medium">
+        The most <span class="underline decoration-sick decoration-2">relaxing game</span> on the internet. Fold real paper, scan with your phone, and unlock the next level. No timers. No fails.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <button onclick="scrollToLevels()" class="bg-sick text-white px-8 py-4 font-black text-sm tracking-widest hover:bg-ink transition flex items-center gap-2">
+          START AT LEVEL 1 — FREE <span>→</span>
+        </button>
+        <button onclick="toggleZen()" class="border-2 border-ink px-6 py-4 font-bold text-sm tracking-widest bg-paper hover:bg-ink hover:text-paper transition">✦ TRY ZEN MODE</button>
+      </div>
+      <div class="mt-8 flex items-center gap-6 text-[12px] font-mono">
+        <div class="flex -space-x-2">
+          <img src="https://i.pravatar.cc/100?img=33" class="w-8 h-8 rounded-full border-2 border-paper">
+          <img src="https://i.pravatar.cc/100?img=14" class="w-8 h-8 rounded-full border-2 border-paper">
+          <img src="https://i.pravatar.cc/100?img=26" class="w-8 h-8 rounded-full border-2 border-paper">
+        </div>
+        <span class="text-ink/60">2,847 folders breathing right now &nbsp;•&nbsp; <span class="text-ink font-bold">4.9/5 calm rating</span></span>
+      </div>
+    </div>
+
+    <!-- Right - Floating Paper Card -->
+    <div class="lg:col-span-5 relative lg:h-[520px] flex items-center justify-center">
+      <!-- Phone Mock -->
+      <div class="relative w-[300px] md:w-[340px]">
+        <!-- Card behind -->
+        <div class="absolute -top-6 -right-6 w-full h-full bg-sand border-2 border-ink rotate-2"></div>
+        <div class="absolute -top-3 -right-3 w-full h-full bg-white border-2 border-ink rotate-1"></div>
+        <!-- Main Card -->
+        <div class="relative bg-white border-2 border-ink p-5 shadow-[8px_8px_0px_#0A0A0A]">
+          <div class="flex justify-between items-center text-[10px] font-mono tracking-widest">
+            <span>SIKOGAMI SCANNER v1.0</span><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+          </div>
+          <!-- Origami Preview -->
+          <div class="mt-3 bg-cream border border-ink/10 h-[220px] relative overflow-hidden flex items-center justify-center paper-grid">
+            <div id="heroOrigami" class="text-[90px] select-none transition-transform duration-700 hover:rotate-12 hover:scale-110 cursor-pointer">⛵</div>
+            <div class="absolute bottom-2 left-2 right-2 bg-ink text-paper text-[10px] font-mono px-2 py-1.5 flex justify-between">
+              <span>DETECTED: PAPER BOAT</span><span class="text-[#22c55e]">98% MATCH</span>
+            </div>
+            <!-- Scanning line -->
+            <div class="scan-line"></div>
+          </div>
+          <div class="mt-3 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] font-mono tracking-widest text-ink/60">NEXT LEVEL</div>
+              <div class="font-black text-lg leading-none">BUTTERFLY → UNLOCKED</div>
+            </div>
+            <div class="w-12 h-12 bg-sick text-white flex items-center justify-center text-xl">✓</div>
+          </div>
+          <div class="mt-3 bg-sage/20 border border-sage px-3 py-2 text-[11px] font-mono leading-tight">
+            ✦ Nice creases! Your boat is ready to sail. +100 XP earned.
+          </div>
+        </div>
+        <!-- Floating badges -->
+        <div class="absolute -left-8 top-12 bg-ink text-paper text-[10px] font-mono px-3 py-2 rotate-[-6deg] shadow-lg">ANY PAPER WORKS!</div>
+        <div class="absolute -right-4 bottom-16 bg-sick text-white text-[10px] font-black px-3 py-2 rotate-[3deg] shadow-lg">SCAN WITH PHONE 📱</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Marquee -->
+  <div class="border-y-2 border-ink bg-ink text-paper py-2 overflow-hidden">
+    <div class="marquee flex gap-8 font-mono text-xs tracking-[0.2em] whitespace-nowrap">
+      <span>FOLD REAL PAPER</span> <span class="text-sick">◆</span> <span>SCAN WITH MOBILE</span> <span class="text-sick">◆</span> <span>LEVEL UP INSTANTLY</span> <span class="text-sick">◆</span> <span>FEEL RELAXED</span> <span class="text-sick">◆</span> <span>REPEAT</span> <span class="text-sick">◆</span>
+      <span>FOLD REAL PAPER</span> <span class="text-sick">◆</span> <span>SCAN WITH MOBILE</span> <span class="text-sick">◆</span> <span>LEVEL UP INSTANTLY</span> <span class="text-sick">◆</span> <span>FEEL RELAXED</span> <span class="text-sick">◆</span> <span>REPEAT</span> <span class="text-sick">◆</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="max-w-7xl mx-auto px-6 py-8">
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="border-2 border-ink p-5 bg-white flex gap-4">
+      <div class="w-12 h-12 bg-ink text-paper flex items-center justify-center font-black text-xl shrink-0">1</div>
+      <div><div class="font-black tracking-tight">FOLD IRL</div><div class="text-sm text-ink/60 leading-tight mt-1">Follow 3D steps. Use any paper — even newspaper.</div></div>
+    </div>
+    <div class="border-2 border-ink p-5 bg-sick text-white flex gap-4">
+      <div class="w-12 h-12 bg-white text-sick flex items-center justify-center font-black text-xl shrink-0">2</div>
+      <div><div class="font-black tracking-tight">SCAN WITH PHONE</div><div class="text-sm text-white/80 leading-tight mt-1">Take a photo. Our AI checks your fold in 2 sec.</div></div>
+    </div>
+    <div class="border-2 border-ink p-5 bg-white flex gap-4">
+      <div class="w-12 h-12 bg-sage flex items-center justify-center font-black text-xl shrink-0">3</div>
+      <div><div class="font-black tracking-tight">LEVEL UP + BREATHE</div><div class="text-sm text-ink/60 leading-tight mt-1">Unlock next world + collect in your Zen Garden.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LEVELS MAP -->
+<section id="levels" class="max-w-7xl mx-auto px-6 py-10">
+  <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+    <div>
+      <div class="text-[11px] font-mono tracking-[0.2em] text-sick font-bold">THE JOURNEY • 6 LEVELS • 2 WORLDS</div>
+      <h2 class="text-[42px] font-black tracking-tighter leading-none mt-1">YOUR PATH TO MASTER<span class="font-serif italic font-normal">.</span></h2>
+    </div>
+    <div class="text-right">
+      <div class="text-[11px] font-mono tracking-widest text-ink/60">PROGRESS</div>
+      <div class="font-black text-2xl"><span id="progressText">0</span>/6 COMPLETED</div>
+      <div class="w-[160px] h-2 bg-ink/10 mt-1 overflow-hidden"><div id="progressBar" class="h-full bg-sick transition-all duration-700" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Worlds -->
+  <div class="space-y-16 relative">
+    <!-- Dotted Path Line -->
+    <div class="hidden lg:block absolute left-1/2 top-10 bottom-10 w-[2px] border-l-2 border-dashed border-ink/20 -translate-x-1/2"></div>
+
+    <!-- Level cards will be injected by JS -->
+    <div id="levelsContainer" class="space-y-6"></div>
+  </div>
+</section>
+
+<!-- GARDEN -->
+<section id="garden" class="bg-ink text-paper mt-12 py-12">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-wrap justify-between gap-4 items-end">
+      <div>
+        <div class="text-sick font-mono text-xs tracking-[0.2em]">MY GARDEN • YOUR COLLECTION</div>
+        <h3 class="text-[36px] font-black tracking-tighter mt-1">EVERY FOLD LIVES HERE<span class="text-sick">.</span></h3>
+      </div>
+      <div class="text-sm font-mono text-paper/60 max-w-[360px]">Folded origamis appear here as a zen garden. The more you fold, the calmer your garden becomes.</div>
+    </div>
+    <div id="gardenGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-8">
+      <!-- injected -->
+    </div>
+    <div id="emptyGarden" class="mt-6 border border-dashed border-paper/20 p-8 text-center font-mono text-sm text-paper/40">
+      Your garden is empty. Fold your first boat to plant a seed 🌱
+    </div>
+  </div>
+</section>
+
+<!-- STORE -->
+<section id="store" class="max-w-7xl mx-auto px-6 py-12">
+  <div class="flex flex-wrap justify-between items-end gap-4">
+    <div>
+      <div class="inline-flex bg-sick text-white text-[11px] font-mono px-2 py-1 tracking-widest">MONETIZE • AFFILIATE + COLLAB</div>
+      <h3 class="text-[36px] font-black tracking-tighter leading-none mt-2">PAPER MAKES THE MAGIC<span class="text-sick">.</span></h3>
+      <p class="text-sm text-ink/60 mt-2 max-w-[520px]">Any paper works. But good paper <em>folds better, feels better</em>. Our curated picks — we earn a small cut, you get 15% off with <span class="bg-ink text-paper px-1 font-mono text-xs">SIK15</span></p>
+    </div>
+    <a href="#" class="hidden md:inline-flex border-2 border-ink px-5 py-2 font-mono text-xs tracking-widest hover:bg-ink hover:text-paper transition">VISIT FULL STORE →</a>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-4 mt-8">
+    <!-- Product 1 -->
+    <div class="border-2 border-ink bg-white p-4 group hover:shadow-[6px_6px_0px_#0A0A0A] transition">
+      <div class="bg-cream h-[160px] flex items-center justify-center relative overflow-hidden">
+        <div class="flex gap-1">
+          <div class="w-12 h-16 bg-[#FFB3C1] border border-ink/10 shadow-sm rotate-[-2deg]"></div>
+          <div class="w-12 h-16 bg-[#A8D5BA] border border-ink/10 shadow-sm rotate-[1deg] -ml-1"></div>
+          <div class="w-12 h-16 bg-[#FFE08A] border border-ink/10 shadow-sm rotate-[-1deg] -ml-1"></div>
+        </div>
+        <span class="absolute top-2 left-2 bg-ink text-paper text-[10px] font-mono px-2 py-1">BESTSELLER</span>
+      </div>
+      <div class="mt-3">
+        <div class="font-black leading-tight">SikOgami Calm Pack — Pastels</div>
+        <div class="text-xs text-ink/60">60 sheets • 15x15cm • Toyo Kami</div>
+        <div class="mt-2 flex items-center justify-between">
+          <div><span class="font-black">₹399</span> <span class="text-xs line-through text-ink/40">₹499</span></div>
+          <button onclick="toast('Added to cart — use SIK15 for 15% off!')" class="bg-ink text-paper text-xs font-mono px-3 py-1.5">ADD →</button>
+        </div>
+      </div>
+    </div>
+    <!-- Product 2 -->
+    <div class="border-2 border-ink bg-white p-4 group hover:shadow-[6px_6px_0px_#0A0A0A] transition">
+      <div class="bg-cream h-[160px] flex items-center justify-center relative">
+        <div class="w-20 h-20 bg-[#0A0A0A] border-4 border-[#C9A86A] shadow-lg rotate-3 flex items-center justify-center text-[#C9A86A] font-black text-xl">金</div>
+        <span class="absolute top-2 left-2 bg-sick text-white text-[10px] font-mono px-2 py-1">FOR DRAGONS</span>
+      </div>
+      <div class="mt-3">
+        <div class="font-black leading-tight">Vibrant Washi — Master Set</div>
+        <div class="text-xs text-ink/60">30 sheets • Textured • Oddy Collab</div>
+        <div class="mt-2 flex items-center justify-between">
+          <div><span class="font-black">₹649</span></div>
+          <button onclick="toast('Added! Ships in 24h — free crease tool included')" class="bg-ink text-paper text-xs font-mono px-3 py-1.5">ADD →</button>
+        </div>
+      </div>
+    </div>
+    <!-- Product 3 -->
+    <div class="border-2 border-ink bg-white p-4 group hover:shadow-[6px_6px_0px_#0A0A0A] transition">
+      <div class="bg-cream h-[160px] flex items-center justify-center relative">
+        <div class="flex flex-col items-center">
+          <div class="w-24 h-3 bg-ink rounded-full"></div>
+          <div class="w-20 h-12 bg-stone-200 border border-ink/10 -mt-1"></div>
+          <div class="text-[10px] font-mono mt-1">BONE FOLDER + MAT</div>
+        </div>
+        <span class="absolute top-2 left-2 bg-sage text-ink text-[10px] font-mono px-2 py-1">TOOLKIT</span>
+      </div>
+      <div class="mt-3">
+        <div class="font-black leading-tight">Starter Toolkit — Fold Kit</div>
+        <div class="text-xs text-ink/60">Bone folder, mat, ruler • Perfect creases</div>
+        <div class="mt-2 flex items-center justify-between">
+          <div><span class="font-black">₹299</span></div>
+          <button onclick="toast('Toolkit added! Your creases will thank you ✨')" class="bg-ink text-paper text-xs font-mono px-3 py-1.5">ADD →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 bg-sage/20 border-2 border-ink p-4 flex flex-wrap gap-4 items-center justify-between">
+    <div class="font-mono text-xs">✦ BRAND COLLAB OPEN: Toyo • Daler-Rowney • Oddy — Want to feature your paper? <a href="#" class="underline">Contact us</a></div>
+    <div class="text-xs font-mono bg-white border border-ink px-3 py-1">AFFILIATE: amazon.in / flipkart • 8-12% commission</div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t-2 border-ink bg-paper py-8">
+  <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-between gap-6 text-xs font-mono">
+    <div>© 2026 SikOgami — Fold. Breathe. Level Up. <br><span class="text-ink/50">Made for stressful worlds.</span></div>
+    <div class="flex gap-6">
+      <a href="#" class="underline">Instagram</a><a href="#" class="underline">YouTube</a><a href="#" class="underline">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<!-- FOLD MODAL -->
+<div id="foldModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-ink/60 backdrop-blur-sm" onclick="closeModal()"></div>
+  <div class="absolute inset-0 md:inset-6 bg-paper border-2 border-ink overflow-auto flex flex-col max-w-6xl md:mx-auto shadow-2xl">
+    <!-- Modal Header -->
+    <div class="sticky top-0 bg-paper border-b-2 border-ink px-6 h-[64px] flex items-center justify-between z-10">
+      <div class="flex items-center gap-3">
+        <div id="modalLevelBadge" class="w-10 h-10 bg-ink text-paper flex items-center justify-center font-black">1</div>
+        <div>
+          <div id="modalTitle" class="font-black text-lg leading-none">PAPER BOAT</div>
+          <div id="modalWorld" class="text-[11px] font-mono tracking-widest text-ink/60">WORLD 1 • THE CALM SHORE</div>
+        </div>
+      </div>
+      <button onclick="closeModal()" class="w-10 h-10 border-2 border-ink flex items-center justify-center hover:bg-ink hover:text-paper transition">✕</button>
+    </div>
+
+    <div class="grid lg:grid-cols-2 flex-1">
+      <!-- Left: Steps -->
+      <div class="p-6 border-r-2 border-ink/10">
+        <div class="flex justify-between items-center">
+          <div class="text-[11px] font-mono tracking-widest">STEP <span id="stepNum">1</span> / <span id="stepTotal">4</span></div>
+          <div class="flex gap-1" id="stepDots"></div>
+        </div>
+        <!-- Visual -->
+        <div class="mt-4 bg-cream border-2 border-ink h-[280px] flex flex-col items-center justify-center relative overflow-hidden paper-grid">
+          <div id="stepEmoji" class="text-[88px] leading-none transition-all duration-500">📄</div>
+          <div id="stepVisual" class="mt-3 font-mono text-xs bg-white border border-ink px-3 py-1.5 text-center max-w-[80%]">Start with a square paper, colored side up</div>
+          <div class="absolute bottom-2 left-2 bg-ink text-paper text-[10px] font-mono px-2 py-1">DRAG TO ROTATE • 3D VIEW</div>
+        </div>
+        <!-- Step Text -->
+        <h4 id="stepTitle" class="mt-4 font-black text-xl">Fold in half</h4>
+        <p id="stepDesc" class="text-sm text-ink/70 mt-1 leading-relaxed">Take the bottom edge and bring it to the top edge. Crease sharply with your bone folder or nail.</p>
+        
+        <div class="mt-4 flex gap-2">
+          <button onclick="prevStep()" id="prevBtn" class="flex-1 border-2 border-ink py-3 font-mono text-xs tracking-widest hover:bg-ink hover:text-paper transition">← PREV</button>
+          <button onclick="nextStep()" id="nextBtn" class="flex-1 bg-ink text-paper py-3 font-mono text-xs tracking-widest hover:bg-sick transition">NEXT →</button>
+        </div>
+
+        <!-- Paper Reco -->
+        <div class="mt-4 bg-sage/20 border border-ink p-3 flex gap-3 items-center">
+          <div class="w-12 h-12 bg-white border border-ink flex items-center justify-center text-xl">🎨</div>
+          <div class="text-xs leading-tight"><span class="font-bold">Paper tip:</span> <span id="paperTip">Use light blue for ocean vibes. Any paper works though!</span> <a href="#store" onclick="closeModal()" class="underline">Get it →</a></div>
+        </div>
+      </div>
+
+      <!-- Right: Scan -->
+      <div class="p-6 bg-white flex flex-col">
+        <div class="bg-ink text-paper px-3 py-2 font-mono text-xs tracking-widest flex justify-between">
+          <span>📱 SCAN TO LEVEL UP</span><span class="text-sage">AI VERIFIED</span>
+        </div>
+        <div class="border-2 border-ink border-t-0 p-4 flex-1 flex flex-col">
+          <div id="scanIdle">
+            <div class="border-2 border-dashed border-ink/20 bg-cream h-[200px] flex flex-col items-center justify-center gap-3 p-4 text-center">
+              <div class="w-14 h-14 bg-ink text-paper flex items-center justify-center text-xl">📸</div>
+              <div class="text-xs font-mono leading-tight">Fold it IRL, then scan.<br>Works with any camera.</div>
+              <label class="bg-sick text-white px-6 py-2.5 font-black text-xs tracking-widest cursor-pointer hover:bg-ink transition">
+                UPLOAD / TAKE PHOTO
+                <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleScan(event)">
+              </label>
+              <div class="text-[10px] font-mono text-ink/50">or drag & drop image here</div>
+            </div>
+            <div class="mt-3 text-[11px] font-mono bg-sand border border-ink/10 p-3">
+              <strong>How scanning works:</strong> Our AI looks for shape, folds, and shadows. No personal data stored. Even imperfect folds pass if effort is shown — we want you to relax, not stress.
+            </div>
+            <!-- Dev cheat -->
+            <button onclick="mockScanSuccess()" class="mt-3 w-full border border-ink py-2 font-mono text-[11px] tracking-widest hover:bg-ink hover:text-paper transition">✦ DEV: MOCK PASS (for demo)</button>
+          </div>
+
+          <div id="scanChecking" class="hidden flex-1 flex flex-col items-center justify-center gap-4 py-8">
+            <div class="w-20 h-20 border-4 border-ink border-t-sick rounded-full animate-spin"></div>
+            <div class="font-black">AI IS CHECKING YOUR FOLD...</div>
+            <div class="text-xs font-mono text-ink/60">Analyzing creases • shadows • shape</div>
+            <div class="w-full h-2 bg-ink/10 overflow-hidden"><div class="h-full bg-sick animate-[progress_2s_ease-in-out_infinite]" style="width:60%"></div></div>
+          </div>
+
+          <div id="scanPreview" class="hidden">
+            <img id="previewImg" class="w-full h-[200px] object-cover border-2 border-ink">
+            <div id="scanResult" class="mt-3 hidden"></div>
+          </div>
+        </div>
+
+        <div class="mt-3 flex items-center gap-2 text-[11px] font-mono text-ink/60">
+          <span class="w-2 h-2 bg-[#22c55e] rounded-full"></span> On-device preview only • Nothing uploaded without consent
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink text-paper px-6 py-3 font-mono text-xs tracking-wide shadow-xl translate-y-[150%] transition duration-300 z-[110]">Added!</div>
+
+<!-- Zen Overlay -->
+<div id="zenOverlay" class="fixed inset-0 z-[90] hidden bg-[#FDFBF7]">
+  <div class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+    <button onclick="toggleZen()" class="absolute top-6 right-6 w-10 h-10 border-2 border-ink flex items-center justify-center">✕</button>
+    <div class="text-[11px] font-mono tracking-[0.2em]">ZEN MODE • BREATHE WITH THE PAPER</div>
+    <div class="mt-6 w-[280px] h-[280px] bg-white border-2 border-ink shadow-[8px_8px_0px_#0A0A0A] flex items-center justify-center relative overflow-hidden">
+      <div id="breathingPaper" class="w-32 h-32 bg-cream border-2 border-ink shadow-sm flex items-center justify-center text-4xl transition-transform duration-4000">📄</div>
+      <div class="absolute bottom-2 font-mono text-[10px] tracking-widest" id="breathText">INHALE • 4s</div>
+    </div>
+    <div class="mt-6 font-serif italic text-xl text-ink/70">"Paper remembers every gentle fold."</div>
+    <button onclick="toggleZen()" class="mt-6 border-2 border-ink px-6 py-2 font-mono text-xs tracking-widest">EXIT ZEN</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
