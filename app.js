@@ -406,7 +406,15 @@ function isCompleted(id) { return progress.includes(id); }
 const TOTAL = LEVELS.length;
 
 // ——— SVG GENERATOR — SHAPE-ACCURATE MORPH ———
-function getStepSvg(type){
+function getStepSvg(type, finalType){
+  // Ghost final preview when not at final step
+  let ghost="";
+  if(finalType && finalType!==type && finalType.includes("final")){
+    // draw faint final outline behind: use same maps but at low opacity
+    const paperGhost="#FFF8E7";
+    // we will let caller handle ghost via extra layer, but for now just add hint text
+    ghost=`<text x="50" y="95" text-anchor="middle" font-family="monospace" font-size="4" fill="#999" opacity="0.6">→ ${finalType.replace("-final","").toUpperCase()} </text>`;
+  }
   const paper="#FFF8E7", paperBack="#F0E6D3", stroke="#0A0A0A", red="#FF3B30", blue="#1E40AF", sage="#A8D5BA", shadow="rgba(0,0,0,0.08)";
   const base = (shapePath, lines) => `<svg viewBox="0 0 100 100" class="w-full h-full"><rect x="0" y="0" width="100" height="100" rx="2" fill="${paper}" opacity="0.15"/><g filter="url(#sh)">${shapePath}</g>${lines || ""}<defs><filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="0.8" flood-opacity="0.12"/></filter></defs></svg>`;
   const sq = `<rect x="12" y="12" width="76" height="76" rx="1.2" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/>`;
@@ -447,7 +455,7 @@ function getStepSvg(type){
     "default": base(sq, "")
   };
   const inner = maps[type] || maps["default"];
-  return `<svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+  return `<svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">${inner}${ghost}</svg>`;
 }
 
 
@@ -690,9 +698,11 @@ function renderStep() {
   document.getElementById('stepEmoji').textContent = step.emoji;
   document.getElementById('stepEmoji').style.transform = `rotate(${currentStep*2}deg)`;
   document.getElementById('stepVisual').textContent = step.visual;
-  const svgContainer=document.getElementById('stepSvg'); if(svgContainer) svgContainer.innerHTML=getStepSvg(step.svgType||'paper-flat');
+  const svgContainer=document.getElementById('stepSvg'); if(svgContainer){ const stepsAll=currentLevel._detailed||currentLevel.steps; const finalType=stepsAll[stepsAll.length-1].svgType; svgContainer.innerHTML=getStepSvg(step.svgType||'paper-flat', finalType); svgContainer.style.opacity='0'; setTimeout(()=>svgContainer.style.opacity='1', 50); }
   const svgHintEl=document.getElementById('svgHint'); if(svgHintEl){ const tt=step.svgType||''; svgHintEl.textContent = tt.includes('turn')? '↺ TURN OVER — flip': tt.includes('unfold')? 'CREASE WELL, THEN UNFOLD': tt.includes('mountain')? 'MOUNTAIN (blue) — behind': tt.includes('valley')? 'VALLEY (red) — forward': 'FOLLOW RED/BLUE DOTTED LINES'; }
   const lbl=document.getElementById('stepSvgLabel'); if(lbl){ lbl.textContent = (step.svgType||'VALLEY').replace('-',' ').toUpperCase(); }
+  const morph=document.getElementById('morphBar'); if(morph){ const stepsAll2=currentLevel._detailed||currentLevel.steps; const pct=Math.round((currentStep+1)/stepsAll2.length*100); morph.style.width=pct+'%'; morph.textContent=pct+'%'; }
+  const morphLabel=document.getElementById('morphLabel'); if(morphLabel){ const stepsAll3=currentLevel._detailed||currentLevel.steps; const pct3=Math.round((currentStep+1)/stepsAll3.length*100); morphLabel.textContent=`Morph ${pct3}% → ${currentLevel.title}`; }
   document.getElementById('stepTitle').textContent = step.title;
   document.getElementById('stepDesc').textContent = step.desc;
   document.getElementById('prevBtn').style.visibility = currentStep===0 ? 'hidden' : 'visible';
