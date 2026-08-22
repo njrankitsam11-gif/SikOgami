@@ -198,14 +198,37 @@ tailwind.config = {
       </div>
     </button>
     <div id="gardenCollapsible" class="hidden mt-4">
+      <!-- Stats bar -->
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <div class="bg-white/[0.06] border border-paper/15 p-3 text-center">
+          <div class="text-[20px] font-black leading-none" id="statCollected">1/30</div>
+          <div class="text-[10px] font-mono tracking-widest text-paper/60 mt-1">COLLECTED</div>
+        </div>
+        <div class="bg-white/[0.06] border border-paper/15 p-3 text-center">
+          <div class="text-[20px] font-black leading-none" id="statWorlds">1/5</div>
+          <div class="text-[10px] font-mono tracking-widest text-paper/60 mt-1">WORLDS UNLOCKED</div>
+        </div>
+        <div class="bg-white/[0.06] border border-paper/15 p-3 text-center">
+          <div class="text-[20px] font-black leading-none" id="statPapers">1</div>
+          <div class="text-[10px] font-mono tracking-widest text-paper/60 mt-1">PAPERS FOLDED</div>
+        </div>
+      </div>
+      <!-- Filter pills -->
+      <div class="flex flex-wrap gap-2 mb-3" id="gardenFilters">
+        <button onclick="setGardenFilter('all')" data-filter="all" class="garden-filter active bg-paper text-ink px-3 py-1.5 text-[11px] font-mono tracking-widest border-2 border-paper">ALL 30</button>
+        <button onclick="setGardenFilter('collected')" data-filter="collected" class="garden-filter bg-transparent text-paper border border-paper/20 px-3 py-1.5 text-[11px] font-mono tracking-widest hover:bg-white/10">✓ COLLECTED</button>
+        <button onclick="setGardenFilter('locked')" data-filter="locked" class="garden-filter bg-transparent text-paper border border-paper/20 px-3 py-1.5 text-[11px] font-mono tracking-widest hover:bg-white/10">🔒 LOCKED</button>
+        <button onclick="setGardenFilter('single')" data-filter="single" class="garden-filter bg-transparent text-paper border border-paper/20 px-3 py-1.5 text-[11px] font-mono tracking-widest hover:bg-white/10">1 PAPER</button>
+        <button onclick="setGardenFilter('multi')" data-filter="multi" class="garden-filter bg-transparent text-paper border border-paper/20 px-3 py-1.5 text-[11px] font-mono tracking-widest hover:bg-white/10">MULTI</button>
+      </div>
       <div id="gardenGrid" class="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scroll-smooth" style="scrollbar-width:thin;">
         <!-- injected as horizontal cards -->
       </div>
-      <div id="emptyGarden" class="hidden border border-dashed border-paper/20 p-6 text-center font-mono text-sm text-paper/40">
-        Your garden is empty. Fold your first boat to plant a seed 🌱
+      <div id="emptyGarden" class="hidden border border-dashed border-paper/20 p-6 text-center font-mono text-sm text-paper/60">
+        Your garden is empty. Fold your first boat to plant a seed 🌱 — try filter <b>ALL</b>
       </div>
-      <div class="flex justify-between items-center mt-2 text-[10px] font-mono text-paper/40">
-        <span>← Scroll to see all 30 →</span><button onclick="toggleGarden()" class="underline">Collapse ▲</button>
+      <div class="flex justify-between items-center mt-2 text-[10px] font-mono text-paper/50">
+        <span>← Scroll horizontally to see all →</span><button onclick="toggleGarden()" class="underline hover:text-paper">Collapse ▲</button>
       </div>
     </div>
   </div>

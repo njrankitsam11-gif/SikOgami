@@ -470,14 +470,25 @@ function renderLevels() {
 }
 
 let gardenOpen = false;
+let gardenFilter = 'all';
 function toggleGarden(){
   gardenOpen = !gardenOpen;
   const col=document.getElementById('gardenCollapsible');
   const icon=document.getElementById('gardenToggleIcon');
   const summary=document.getElementById('gardenSummary');
   if(!col||!icon) return;
-  if(gardenOpen){ col.classList.remove('hidden'); icon.textContent='▲ COLLAPSE'; if(summary) summary.textContent='tap to collapse'; }
-  else { col.classList.add('hidden'); icon.textContent='▼ EXPAND'; if(summary) summary.textContent=`${progress.length}/30 collected → tap to expand`; }
+  if(gardenOpen){ col.classList.remove('hidden'); icon.innerHTML='▲ COLLAPSE <span class="text-[10px]">⌃</span>'; if(summary) summary.textContent='tap to collapse'; }
+  else { col.classList.add('hidden'); icon.innerHTML='▼ EXPAND <span class="text-[10px]">⌄</span>'; if(summary) summary.textContent=`${progress.length}/30 collected → tap to expand`; }
+}
+function setGardenFilter(f){
+  gardenFilter=f;
+  document.querySelectorAll('.garden-filter').forEach(b=>{
+    const isActive=b.dataset.filter===f;
+    b.className=isActive
+      ? 'garden-filter active bg-paper text-ink px-3 py-1.5 text-[11px] font-mono tracking-widest border-2 border-paper'
+      : 'garden-filter bg-transparent text-paper border border-paper/20 px-3 py-1.5 text-[11px] font-mono tracking-widest hover:bg-white/10';
+  });
+  renderGarden();
 }
 function renderGarden() {
   const grid = document.getElementById('gardenGrid');
@@ -485,25 +496,49 @@ function renderGarden() {
   const summary=document.getElementById('gardenSummary');
   if (!grid || !empty) return;
   if(summary) summary.textContent = `${progress.length}/30 collected → ${gardenOpen?'tap to collapse':'tap to expand'}`;
+  // stats
+  const sc=document.getElementById('statCollected'); if(sc) sc.textContent=`${progress.length}/30`;
+  const sw=document.getElementById('statWorlds'); if(sw){
+    const worlds=new Set(LEVELS.filter(l=>progress.includes(l.id)).map(l=>l.world)).size;
+    sw.textContent=`${worlds|| (progress.length?1:0)}/5`;
+  }
+  const sp=document.getElementById('statPapers'); if(sp){
+    const totalPapers=LEVELS.filter(l=>progress.includes(l.id)).reduce((a,l)=>a+l.sheets,0);
+    sp.textContent= totalPapers || progress.length;
+  }
+  // filter
+  let list=LEVELS;
+  if(gardenFilter==='collected') list=LEVELS.filter(l=>isCompleted(l.id));
+  else if(gardenFilter==='locked') list=LEVELS.filter(l=>!isCompleted(l.id));
+  else if(gardenFilter==='single') list=LEVELS.filter(l=>l.sheets===1);
+  else if(gardenFilter==='multi') list=LEVELS.filter(l=>l.sheets>1);
+
   grid.innerHTML = '';
-  if (progress.length===0 && !gardenOpen) {
-    // keep collapsed view minimal: still hide grid, show hint inside collapsible only when opened
+  if (list.length===0) {
+    empty.classList.remove('hidden'); empty.style.display='block'; grid.style.display='none';
+    empty.innerHTML=`No ${gardenFilter} items — try <b>ALL</b> filter`;
+    return;
+  }
+  if (progress.length===0 && !gardenOpen && gardenFilter==='all') {
     empty.style.display='none'; grid.style.display='none';
-    // if user opens, show empty
     if(gardenOpen){ empty.classList.remove('hidden'); empty.style.display='block'; grid.style.display='none'; }
     return;
   }
-  if (progress.length===0) { empty.classList.remove('hidden'); empty.style.display='block'; grid.style.display='none'; return; }
+  if (progress.length===0 && gardenFilter==='all') { empty.classList.remove('hidden'); empty.style.display='block'; grid.style.display='none'; empty.innerHTML='Your garden is empty. Fold your first boat to plant a seed 🌱 — try filter <b>ALL</b>'; return; }
+  // has items to show (filtered)
   empty.classList.add('hidden'); empty.style.display='none'; grid.style.display='flex';
-  LEVELS.forEach(lvl => {
+  list.forEach(lvl => {
     const done = isCompleted(lvl.id);
     const div = document.createElement('div');
-    div.className = `shrink-0 snap-start border-2 ${done ? 'border-paper bg-white/10' : 'border-dashed border-paper/20 bg-transparent opacity-60'} w-[110px] p-3 flex flex-col items-center gap-1 text-center ${done?'cursor-pointer hover:bg-white/15 transition':''}`;
-    div.onclick = () => done && openModal(lvl.id);
+    div.className = `shrink-0 snap-start border-2 ${done ? 'border-paper bg-white/10 hover:bg-white/15' : 'border-dashed border-paper/20 bg-transparent opacity-60'} w-[118px] p-3 flex flex-col items-center gap-1.5 text-center ${done?'cursor-pointer transition':''}`;
+    div.onclick = () => done ? openModal(lvl.id) : (!isUnlocked(lvl.id) ? toast(`🔒 Complete Level ${lvl.id-1} first`) : openModal(lvl.id));
+    const worldShort=lvl.world.split('•')[0].trim();
     div.innerHTML = `
-      <div class="w-12 h-12 ${done ? 'bg-white text-ink' : 'bg-paper/5 text-paper/40'} border border-paper/20 flex items-center justify-center text-xl ${done ? '' : 'grayscale'}">${done ? lvl.emoji : '?'}</div>
+      <div class="text-[8px] font-mono tracking-widest ${done?'text-sage':'text-paper/40'}">${worldShort}</div>
+      <div class="w-14 h-14 ${done ? 'bg-white text-ink shadow-sm' : 'bg-paper/5 text-paper/50'} border-2 ${done?'border-paper':'border-paper/20'} flex items-center justify-center text-2xl ${done ? '' : 'grayscale'}">${done ? lvl.emoji : '?'}</div>
       <div class="font-black text-[10px] tracking-widest leading-none">${lvl.title}</div>
-      <div class="text-[8px] font-mono ${done ? 'text-sage' : 'text-paper/40'}">${done ? 'COLLECTED' : 'LOCKED'} • ${lvl.sheets}</div>
+      <div class="text-[8px] font-mono ${done ? 'text-sage' : 'text-paper/50'}">${done ? 'COLLECTED' : isUnlocked(lvl.id)?'UNLOCKED':'LOCKED'} • ${lvl.sheets} PAPER</div>
+      ${done ? '<div class="text-[7px] font-mono bg-[#22c55e] text-white px-1.5 py-0.5">✓ IN GARDEN</div>' : `<div class="text-[7px] font-mono border border-paper/20 px-1.5 py-0.5 ${isUnlocked(lvl.id)?'text-paper/70':'text-paper/30'}">${isUnlocked(lvl.id)?'TAP TO FOLD →':'LOCKED'}</div>`}
     `;
     grid.appendChild(div);
   });
