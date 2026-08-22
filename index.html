@@ -49,10 +49,13 @@ tailwind.config = {
     </div>
     <div class="flex items-center gap-2 md:gap-4">
       <button onclick="toggleTheme()" id="themeBtn" class="w-9 h-9 border-2 border-ink flex items-center justify-center text-sm hover:bg-ink hover:text-paper transition" title="Toggle Dark/Light">🌙</button>
-      <button onclick="toggleZen()" id="zenBtn" class="hidden md:flex items-center gap-2 text-xs font-mono tracking-widest border border-ink px-4 py-2 hover:bg-ink hover:text-paper transition">○ ZEN MODE</button>
-      <button onclick="scrollToGarden()" class="flex items-center gap-2 bg-ink text-paper px-4 py-2 text-xs font-mono tracking-widest">
+      <button onclick="toggleZen()" id="zenBtn" class="hidden lg:flex items-center gap-2 text-xs font-mono tracking-widest border border-ink px-4 py-2 hover:bg-ink hover:text-paper transition">○ ZEN MODE</button>
+      <button onclick="scrollToGarden()" class="hidden md:flex items-center gap-2 bg-ink text-paper px-4 py-2 text-xs font-mono tracking-widest">
         MY GARDEN <span id="gardenCount" class="bg-sick px-1.5 py-0.5 text-white">0/30</span>
       </button>
+      <div id="authArea" class="flex items-center">
+        <!-- injected by JS: LOGIN or avatar -->
+      </div>
     </div>
   </div>
 </nav>
@@ -367,6 +370,57 @@ tailwind.config = {
         <div class="mt-3 flex items-center gap-2 text-[11px] font-mono text-ink/60">
           <span class="w-2 h-2 bg-[#22c55e] rounded-full"></span> On-device preview only • Nothing uploaded without consent
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Auth Modal -->
+<div id="authModal" class="fixed inset-0 z-[110] hidden">
+  <div class="absolute inset-0 bg-ink/60 backdrop-blur-sm" onclick="closeAuth()"></div>
+  <div class="absolute inset-0 flex items-center justify-center p-4">
+    <div class="bg-paper border-2 border-ink w-full max-w-[420px] shadow-[10px_10px_0px_#0A0A0A] overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="bg-ink text-paper px-6 py-4 flex justify-between items-center">
+        <div>
+          <div class="font-black tracking-tight">SIKOGAMI ACCESS</div>
+          <div class="text-[11px] font-mono tracking-widest text-paper/60">FOLD. BREATHE. LEVEL UP.</div>
+        </div>
+        <button onclick="closeAuth()" class="w-8 h-8 border border-paper/20 flex items-center justify-center hover:bg-paper hover:text-ink transition">✕</button>
+      </div>
+      <!-- Tabs -->
+      <div class="flex border-b-2 border-ink">
+        <button onclick="switchAuth('login')" id="tab-login" class="flex-1 py-3 font-black text-xs tracking-widest bg-ink text-paper border-r-2 border-ink">LOGIN</button>
+        <button onclick="switchAuth('signup')" id="tab-signup" class="flex-1 py-3 font-mono text-xs tracking-widest bg-paper hover:bg-sand transition">SIGN UP</button>
+        <button onclick="switchAuth('forgot')" id="tab-forgot" class="flex-1 py-3 font-mono text-xs tracking-widest bg-paper hover:bg-sand transition">FORGOT</button>
+      </div>
+      <div class="p-6">
+        <!-- LOGIN -->
+        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-3">
+          <div class="bg-sage/20 border border-ink p-2 text-[11px] font-mono">🔓 Admin demo: <b>admin@sikogami.com</b> / <b>admin123</b> — unlocks all 30 levels</div>
+          <div><label class="text-[11px] font-mono tracking-widest">EMAIL</label><input id="loginEmail" type="email" required placeholder="you@email.com" class="w-full border-2 border-ink px-3 py-2.5 text-sm font-mono bg-white dark:bg-[#1A1A1A] focus:outline-none focus:border-sick"></div>
+          <div><label class="text-[11px] font-mono tracking-widest">PASSWORD</label><input id="loginPass" type="password" required placeholder="••••••••" class="w-full border-2 border-ink px-3 py-2.5 text-sm font-mono bg-white dark:bg-[#1A1A1A] focus:outline-none focus:border-sick"></div>
+          <div class="flex justify-between items-center text-[11px] font-mono"><label class="flex items-center gap-1"><input type="checkbox" checked> Remember</label><a href="#" onclick="switchAuth('forgot');return false" class="underline">Forgot?</a></div>
+          <button type="submit" class="w-full bg-sick text-white py-3 font-black text-xs tracking-widest hover:bg-ink transition">ENTER DOJO →</button>
+          <div id="loginErr" class="hidden bg-sick/10 border border-sick text-sick text-xs font-mono p-2"></div>
+        </form>
+        <!-- SIGNUP -->
+        <form id="form-signup" onsubmit="handleSignup(event)" class="space-y-3 hidden">
+          <div><label class="text-[11px] font-mono tracking-widest">NAME</label><input id="signupName" type="text" required placeholder="Your name" class="w-full border-2 border-ink px-3 py-2.5 text-sm font-mono bg-white dark:bg-[#1A1A1A] focus:outline-none focus:border-sick"></div>
+          <div><label class="text-[11px] font-mono tracking-widest">EMAIL</label><input id="signupEmail" type="email" required placeholder="you@email.com" class="w-full border-2 border-ink px-3 py-2.5 text-sm font-mono bg-white dark:bg-[#1A1A1A] focus:outline-none focus:border-sick"></div>
+          <div><label class="text-[11px] font-mono tracking-widest">PASSWORD</label><input id="signupPass" type="password" required minlength="4" placeholder="Min 4 chars" class="w-full border-2 border-ink px-3 py-2.5 text-sm font-mono bg-white dark:bg-[#1A1A1A] focus:outline-none focus:border-sick"></div>
+          <div><label class="text-[11px] font-mono tracking-widest">CONFIRM</label><input id="signupPass2" type="password" required placeholder="Repeat password" class="w-full border-2 border-ink px-3 py-2.5 text-sm font-mono bg-white dark:bg-[#1A1A1A] focus:outline-none focus:border-sick"></div>
+          <div class="text-[11px] font-mono text-ink/60">Any email works locally — no backend needed for demo.</div>
+          <button type="submit" class="w-full bg-ink text-paper py-3 font-black text-xs tracking-widest hover:bg-sick transition">CREATE ACCOUNT →</button>
+          <div id="signupErr" class="hidden bg-sick/10 border border-sick text-sick text-xs font-mono p-2"></div>
+        </form>
+        <!-- FORGOT -->
+        <form id="form-forgot" onsubmit="handleForgot(event)" class="space-y-3 hidden">
+          <div class="bg-sand border border-ink p-3 text-xs font-mono leading-tight">Enter your email. We'll reset your password instantly (local demo — no email sent).</div>
+          <div><label class="text-[11px] font-mono tracking-widest">EMAIL</label><input id="forgotEmail" type="email" required placeholder="you@email.com" class="w-full border-2 border-ink px-3 py-2.5 text-sm font-mono bg-white dark:bg-[#1A1A1A] focus:outline-none focus:border-sick"></div>
+          <div><label class="text-[11px] font-mono tracking-widest">NEW PASSWORD</label><input id="forgotPass" type="password" required minlength="4" placeholder="New password" class="w-full border-2 border-ink px-3 py-2.5 text-sm font-mono bg-white dark:bg-[#1A1A1A] focus:outline-none focus:border-sick"></div>
+          <button type="submit" class="w-full bg-sage text-ink border-2 border-ink py-3 font-black text-xs tracking-widest hover:bg-ink hover:text-paper transition">RESET PASSWORD →</button>
+          <div id="forgotErr" class="hidden text-xs font-mono p-2 border"></div>
+        </form>
       </div>
     </div>
   </div>

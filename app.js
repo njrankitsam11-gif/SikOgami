@@ -312,6 +312,21 @@ const LEVELS = [
   },
 ];
 
+// ——— AUTH SYSTEM (localStorage, admin unlock) ———
+function getUsers(){ return JSON.parse(localStorage.getItem('sikogami_users')||'[]'); }
+function setUsers(u){ localStorage.setItem('sikogami_users', JSON.stringify(u)); }
+function getCurrentUser(){ try{return JSON.parse(localStorage.getItem('sikogami_currentUser')||'null')}catch{return null} }
+function setCurrentUser(u){ if(u) localStorage.setItem('sikogami_currentUser', JSON.stringify(u)); else localStorage.removeItem('sikogami_currentUser'); }
+function isAdmin(){ const u=getCurrentUser(); return !!(u && (u.isAdmin || u.email==='admin@sikogami.com')); }
+function ensureDefaultAdmin(){
+  let users=getUsers();
+  if(!users.find(x=>x.email==='admin@sikogami.com')){
+    users.push({name:'Admin', email:'admin@sikogami.com', password:'admin123', isAdmin:true});
+    setUsers(users);
+  }
+}
+ensureDefaultAdmin();
+
 let currentLevel = null;
 let currentStep = 0;
 let progress = JSON.parse(localStorage.getItem('sikogami_progress') || '[]');
@@ -323,6 +338,7 @@ function saveProgress() {
 }
 
 function isUnlocked(id) {
+  if (isAdmin()) return true; // admin sees all
   if (id===1) return true;
   return progress.includes(id-1);
 }
@@ -604,6 +620,92 @@ function confetti() {
   document.head.appendChild(style);
 }
 
+// ——— AUTH UI LOGIC ———
+function renderAuthArea(){
+  const area=document.getElementById('authArea');
+  if(!area) return;
+  const u=getCurrentUser();
+  if(u){
+    const adminTag = isAdmin() ? '<span class="bg-sick text-white text-[9px] font-mono px-1.5 py-0.5 ml-1">ADMIN</span>' : '';
+    const name = u.name || u.email.split('@')[0];
+    area.innerHTML = `
+      <div class="flex items-center gap-2">
+        <div class="hidden md:flex flex-col text-right leading-none">
+          <span class="text-xs font-black tracking-tight flex items-center justify-end">${name.toUpperCase()}${adminTag}</span>
+          <span class="text-[10px] font-mono text-ink/60">${isAdmin()? 'ALL 30 UNLOCKED 🔓' : u.email}</span>
+        </div>
+        <div class="w-9 h-9 bg-ink text-paper flex items-center justify-center font-black text-xs border-2 border-ink">${name[0].toUpperCase()}</div>
+        <button onclick="handleLogout()" class="hidden md:inline-flex border-2 border-ink px-3 py-2 font-mono text-[11px] tracking-widest hover:bg-ink hover:text-paper transition">LOGOUT</button>
+        <button onclick="handleLogout()" class="md:hidden w-9 h-9 border-2 border-ink flex items-center justify-center">⎋</button>
+      </div>`;
+  } else {
+    area.innerHTML = `<button onclick="openAuth('login')" class="bg-sick text-white px-5 py-2.5 font-black text-xs tracking-widest hover:bg-ink transition flex items-center gap-2">LOGIN <span class="hidden md:inline">/ SIGN UP</span></button>`;
+  }
+}
+function openAuth(tab='login'){ document.getElementById('authModal').classList.remove('hidden'); document.body.style.overflow='hidden'; switchAuth(tab); }
+function closeAuth(){ document.getElementById('authModal').classList.add('hidden'); document.body.style.overflow=''; }
+function switchAuth(tab){
+  ['login','signup','forgot'].forEach(t=>{
+    const form=document.getElementById('form-'+t);
+    const btn=document.getElementById('tab-'+t);
+    if(t===tab){ form.classList.remove('hidden'); btn.className='flex-1 py-3 font-black text-xs tracking-widest bg-ink text-paper border-r-2 border-ink'; }
+    else { form.classList.add('hidden'); btn.className='flex-1 py-3 font-mono text-xs tracking-widest bg-paper hover:bg-sand transition border-r-2 border-ink/10'; }
+  });
+}
+function showErr(id,msg){
+  const el=document.getElementById(id);
+  el.textContent=msg; el.classList.remove('hidden');
+  setTimeout(()=>el.classList.add('hidden'),4000);
+}
+function handleSignup(e){
+  e.preventDefault();
+  const name=document.getElementById('signupName').value.trim();
+  const email=document.getElementById('signupEmail').value.trim().toLowerCase();
+  const p=document.getElementById('signupPass').value;
+  const p2=document.getElementById('signupPass2').value;
+  if(p!==p2) return showErr('signupErr','Passwords do not match');
+  let users=getUsers();
+  if(users.find(u=>u.email===email)) return showErr('signupErr','Email already exists — try Login');
+  const isAdminEmail = email==='admin@sikogami.com';
+  const user={name,email,password:p,isAdmin:isAdminEmail};
+  users.push(user); setUsers(users);
+  setCurrentUser(user);
+  renderAuthArea(); renderLevels(); closeAuth();
+  toast(`Welcome ${name}! ${isAdminEmail? '🔓 ADMIN — all levels unlocked!': 'Account created — start folding!'}`);
+}
+function handleLogin(e){
+  e.preventDefault();
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const p=document.getElementById('loginPass').value;
+  const users=getUsers();
+  const u=users.find(x=>x.email===email && x.password===p);
+  if(!u) return showErr('loginErr','Wrong email or password');
+  setCurrentUser(u);
+  renderAuthArea(); renderLevels(); closeAuth();
+  toast(`Welcome back ${u.name}! ${isAdmin()? '🔓 ADMIN — all 30 unlocked': 'Let\'s fold!'}`);
+}
+function handleForgot(e){
+  e.preventDefault();
+  const email=document.getElementById('forgotEmail').value.trim().toLowerCase();
+  const np=document.getElementById('forgotPass').value;
+  let users=getUsers();
+  const idx=users.findIndex(u=>u.email===email);
+  const el=document.getElementById('forgotErr');
+  if(idx===-1){ el.className='text-xs font-mono p-2 border bg-sick/10 border-sick text-sick'; el.textContent='No account with that email'; el.classList.remove('hidden'); return; }
+  users[idx].password=np; setUsers(users);
+  // if current user is this email, update session
+  const cur=getCurrentUser();
+  if(cur && cur.email===email) setCurrentUser(users[idx]);
+  el.className='text-xs font-mono p-2 border bg-[#22c55e]/10 border-[#22c55e] text-[#166534]'; el.textContent='✓ Password reset! Now login with new password.'; el.classList.remove('hidden');
+  setTimeout(()=> switchAuth('login'),1500);
+  toast('Password reset ✓');
+}
+function handleLogout(){
+  setCurrentUser(null);
+  renderAuthArea(); renderLevels();
+  toast('Logged out — see you soon!');
+}
+
 // Utils
 function toast(msg) {
   const t=document.getElementById('toast');
@@ -660,7 +762,7 @@ function stopBreathing(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  updateProgressUI(); renderLevels(); renderGarden(); updateThemeIcon();
+  updateProgressUI(); renderLevels(); renderGarden(); updateThemeIcon(); renderAuthArea();
   setInterval(()=>{
     const h=document.getElementById('heroOrigami');
     if(h) h.style.transform=`rotate(${Math.sin(Date.now()/800)*3}deg)`;
@@ -681,8 +783,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
       }
     });
   },500);
+  // close auth when clicking outside? already handled via overlay
 });
 
 document.addEventListener('keydown', e=>{
-  if(e.key==='Escape') { closeModal(); const z=document.getElementById('zenOverlay'); if(!z.classList.contains('hidden')) toggleZen(); }
+  if(e.key==='Escape') { closeModal(); closeAuth(); const z=document.getElementById('zenOverlay'); if(!z.classList.contains('hidden')) toggleZen(); }
 });
