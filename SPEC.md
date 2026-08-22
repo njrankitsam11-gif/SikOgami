@@ -1,7 +1,7 @@
 # SikOgami — SPEC.md (Agent Source of Truth)
 > **Read this first every session. Update after each module/feature.**
 > Location: `/Users/sam/Desktop/SikOgami/SPEC.md`
-> Last Updated: 2026-08-22 | Version: 2.0.0 | Deployment: https://sikogami.vercel.app
+> Last Updated: 2026-08-22 | Version: 2.1.0 | Deployment: https://sikogami.vercel.app
 
 ## 0. Agent Instructions
 - **At session start:** Read `SPEC.md` + `docs/API_SPEC.md` + `docs/DB_SPEC.md` before any code.
@@ -152,6 +152,7 @@ Client mirror: `sikogami_progress` sorted int[]; `is_admin` drives admin unlock.
 - **2026-08-22 v1.5.0:** Garden compact dropdown `▼ EXPAND` + horizontal snap `flex` + stats + filters + sync badge dark fix.
 - **2026-08-22 v1.6.0:** Garden glow-up filters `all/collected/locked/single/multi` + stats `statCollected/Worlds/Papers` + 118px cards.
 - **2026-08-22 v1.7.0:** Garden dropdown indicator obvious `▼ EXPAND` pill + dashed border + rotating chevron.
+- **2026-08-22 v2.1.0:** Colored paper per level — SVG uses level color (#FFB3C1 pink tulip, #7DD3C8 whale, etc) + dark-stroke adapt, morph ghost (dpl 2vgrgytfi)
 - **2026-08-22 v2.0.0:** Refined morph — shape-accurate SVG (rectangle/diamond/boat hull/whale/dog/heart + 10 finals), level-specific sequences, ghost final hint, morph progress bar (dpl 374rgq708)
 - **2026-08-22 v1.9.0:** Deepened paper crafting — SVG dotted valley/mountain system, 8-10 micro-steps per level (L1 10), CraftPlayer with stepSvg + svgHint, auto-expander for 4→8 (`dpl_5a1ixU75`)
 - **2026-08-22 v1.8.0:** Zen immersive `zen-bg` light/dark fix, timer `00:00`, pattern `4-6/4-4/4-7-8`, play/pause, quotes, sound mock.
