@@ -405,6 +405,68 @@ function isCompleted(id) { return progress.includes(id); }
 
 const TOTAL = LEVELS.length;
 
+// ——— SVG GENERATOR — CLEAN DOTTED CRAFT ———
+function getStepSvg(type){
+  const paper="#FFF8E7", stroke="#0A0A0A", red="#FF3B30", blue="#1E40AF", sage="#A8D5BA";
+  const base = `<rect x="10" y="10" width="80" height="80" rx="1.5" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/>`;
+  const maps = {
+    "paper-flat": base,
+    "valley-h": base + `<line x1="10" y1="50" x2="90" y2="50" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/><path d="M50 62 L50 72 M45 67 L50 72 L55 67" stroke="${red}" stroke-width="1.2" fill="none"/>`,
+    "valley-h-flap": base + `<path d="M10 50 L90 50 L90 70 L10 70 Z" fill="white" opacity="0.9" stroke="${red}" stroke-dasharray="6 4"/><line x1="10" y1="50" x2="90" y2="50" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/>`,
+    "valley-h-unfold": base + `<line x1="10" y1="50" x2="90" y2="50" stroke="${red}" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/><text x="50" y="85" text-anchor="middle" font-family="monospace" font-size="5" fill="#888">UNFOLD</text>`,
+    "valley-v": base + `<line x1="50" y1="10" x2="50" y2="90" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/>`,
+    "valley-v-unfold": base + `<line x1="50" y1="10" x2="50" y2="90" stroke="${red}" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/><path d="M38 50 L48 50 M45 45 L48 50 L45 55" stroke="${red}" fill="none"/>`,
+    "valley-diag": base + `<line x1="10" y1="90" x2="90" y2="10" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/>`,
+    "valley-diag-unfold": base + `<line x1="10" y1="90" x2="90" y2="10" stroke="${red}" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/>`,
+    "valley-diag-right": base + `<line x1="90" y1="10" x2="50" y2="50" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/><path d="M70 30 L75 25" stroke="${red}" stroke-width="1.2"/>`,
+    "valley-diag-left": base + `<line x1="10" y1="10" x2="50" y2="50" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/>`,
+    "mountain-h": base + `<line x1="10" y1="50" x2="90" y2="50" stroke="${blue}" stroke-width="1.6" stroke-dasharray="2 4"/><path d="M50 38 L50 28 M45 33 L50 28 L55 33" stroke="${blue}" fill="none"/>`,
+    "turn-over": base + `<path d="M30 50 A20 20 0 0 1 70 50" stroke="${stroke}" stroke-width="1.2" fill="none" stroke-dasharray="4 2"/><path d="M65 45 L70 50 L65 55" stroke="${stroke}" fill="none"/><text x="50" y="75" text-anchor="middle" font-size="6" font-family="monospace">TURN OVER ↺</text>`,
+    "tuck-corners": base + `<path d="M10 70 L30 70 L30 90" fill="none" stroke="${blue}" stroke-width="1.4" stroke-dasharray="4 2"/><rect x="10" y="10" width="80" height="80" rx="1.5" fill="none" stroke="${stroke}" stroke-width="0.8" opacity="0.3"/>`,
+    "squash-diamond": `<polygon points="50,10 90,50 50,90 10,50" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/><line x1="50" y1="10" x2="50" y2="90" stroke="${red}" stroke-dasharray="6 4"/><line x1="10" y1="50" x2="90" y2="50" stroke="${red}" stroke-dasharray="6 4"/>`,
+    "petal-curl": base + `<path d="M30 60 Q50 30 70 60" stroke="${red}" fill="none" stroke-dasharray="6 4"/><path d="M50 30 Q55 25 60 30" stroke="${sage}" stroke-width="1.2" fill="none"/>`,
+    "inside-reverse": base + `<path d="M50 10 L50 90" stroke="${blue}" stroke-dasharray="2 4"/><path d="M50 50 L30 70" stroke="${red}" stroke-dasharray="6 4"/>`,
+    "petal-fold": base + `<polygon points="50,10 90,50 50,90 10,50" fill="${paper}" stroke="${stroke}"/><line x1="50" y1="30" x2="50" y2="70" stroke="${red}" stroke-dasharray="6 4"/>`,
+    "open-boat": `<path d="M20 60 L50 30 L80 60 L70 75 L30 75 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/><line x1="30" y1="75" x2="70" y2="75" stroke="${red}" stroke-dasharray="4 2"/>`,
+    "open-cup": `<path d="M30 30 L70 30 L60 75 L40 75 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/>`,
+    "whale-final": `<ellipse cx="50" cy="55" rx="30" ry="15" fill="${paper}" stroke="${stroke}"/><circle cx="65" cy="50" r="2" fill="${stroke}"/>`,
+    "dog-final": `<polygon points="50,20 20,50 30,70 70,70 80,50" fill="${paper}" stroke="${stroke}"/><circle cx="40" cy="50" r="2" fill="${stroke}"/><circle cx="60" cy="50" r="2" fill="${stroke}"/>`,
+    "heart-final": `<path d="M50 75 L20 45 A15 15 0 0 1 50 30 A15 15 0 0 1 80 45 Z" fill="#FF6B6B" stroke="${stroke}"/>`,
+    "default": base
+  };
+  const inner = maps[type] || maps["default"];
+  return `<svg viewBox="0 0 100 100" class="w-full h-full">${inner}</svg>`;
+}
+
+// Deepen shallow levels 4→8 via micro-steps (keeps L1 10 as is)
+function getDetailedSteps(level){
+  if(level.steps.length >= 8) return level.steps; // already deep (L1)
+  const orig = level.steps;
+  // Expand 4 → 8: insert UNFOLD, TURN OVER, CREASE hints
+  const expanded = [];
+  orig.forEach((s, idx) => {
+    const svg = s.svgType || (idx===0? "paper-flat" : idx%3===0? "turn-over" : idx%2===0? "valley-diag-right" : "valley-h");
+    expanded.push({...s, svgType: svg});
+    // after each fold except last, insert micro-step
+    if(idx < orig.length -1){
+      if(idx===0){
+        expanded.push({title:"Crease & Guide", desc:"Crease firmly with nail, then UNFOLD. Red dotted becomes faint guide — don't press hard.", emoji:"✚", visual:"Unfold guide", svgType:"valley-h-unfold"});
+      } else if(idx===1){
+        expanded.push({title:"Mirror & Check", desc:"Mirror fold opposite side. Check symmetry — edges meet center, no gap.", emoji:"↔️", visual:"Mirror check", svgType:"valley-diag-left"});
+      } else if(idx===2){
+        expanded.push({title:"Turn Over", desc:"Flip paper over (↺). Mountain on back becomes valley front. Smooth.", emoji:"↺", visual:"Turn over", svgType:"turn-over"});
+      }
+    }
+  });
+  // Ensure 8-9 length: if still <8, pad with finalize
+  while(expanded.length < 8){
+    expanded.push({title:"Shape & Soften", desc:"Soften curves with thumb, not nail. Paper remembers gentle pressure.", emoji:"🤲", visual:"Soften", svgType:"petal-curl"});
+  }
+  // Cap to 10
+  return expanded.slice(0,10);
+}
+
+
 function updateProgressUI() {
   const count = progress.length;
   document.getElementById('gardenCount').textContent = `${count}/${TOTAL}`;
@@ -547,13 +609,14 @@ function renderGarden() {
 // Modal
 function openModal(id) {
   currentLevel = LEVELS.find(l=>l.id===id);
+  currentLevel._detailed = getDetailedSteps(currentLevel);
   currentStep = 0;
   document.getElementById('foldModal').classList.remove('hidden');
   document.getElementById('modalLevelBadge').textContent = currentLevel.id;
   document.getElementById('modalTitle').textContent = currentLevel.title;
   document.getElementById('modalWorld').textContent = currentLevel.world + ` • ${currentLevel.sheets} PAPER${currentLevel.sheets>1?'S':''}`;
   document.getElementById('paperTip').textContent = currentLevel.paperTip;
-  document.getElementById('stepTotal').textContent = currentLevel.steps.length;
+  document.getElementById('stepTotal').textContent = currentLevel._detailed.length;
   document.getElementById('scanIdle').classList.remove('hidden');
   document.getElementById('scanChecking').classList.add('hidden');
   document.getElementById('scanPreview').classList.add('hidden');
@@ -567,18 +630,23 @@ function closeModal() {
   document.body.style.overflow='';
 }
 function renderStep() {
-  const step = currentLevel.steps[currentStep];
+  const steps = currentLevel._detailed || currentLevel.steps;
+  const step = steps[currentStep];
   document.getElementById('stepNum').textContent = currentStep+1;
   document.getElementById('stepEmoji').textContent = step.emoji;
   document.getElementById('stepEmoji').style.transform = `rotate(${currentStep*2}deg)`;
   document.getElementById('stepVisual').textContent = step.visual;
+  const svgContainer=document.getElementById('stepSvg'); if(svgContainer) svgContainer.innerHTML=getStepSvg(step.svgType||'paper-flat');
+  const svgHintEl=document.getElementById('svgHint'); if(svgHintEl){ const tt=step.svgType||''; svgHintEl.textContent = tt.includes('turn')? '↺ TURN OVER — flip': tt.includes('unfold')? 'CREASE WELL, THEN UNFOLD': tt.includes('mountain')? 'MOUNTAIN (blue) — behind': tt.includes('valley')? 'VALLEY (red) — forward': 'FOLLOW RED/BLUE DOTTED LINES'; }
+  const lbl=document.getElementById('stepSvgLabel'); if(lbl){ lbl.textContent = (step.svgType||'VALLEY').replace('-',' ').toUpperCase(); }
   document.getElementById('stepTitle').textContent = step.title;
   document.getElementById('stepDesc').textContent = step.desc;
   document.getElementById('prevBtn').style.visibility = currentStep===0 ? 'hidden' : 'visible';
   document.getElementById('nextBtn').textContent = currentStep===currentLevel.steps.length-1 ? 'READY TO SCAN ↓' : 'NEXT →';
   const dots = document.getElementById('stepDots');
   dots.innerHTML = '';
-  currentLevel.steps.forEach((_, i) => {
+  const allSteps = currentLevel._detailed || currentLevel.steps;
+  allSteps.forEach((_, i) => {
     const d = document.createElement('div');
     d.className = `w-6 h-1.5 ${i===currentStep ? 'bg-ink' : i<currentStep ? 'bg-sage' : 'bg-ink/10'}`;
     dots.appendChild(d);
@@ -588,7 +656,8 @@ function renderStep() {
   if (hint) hint.textContent = `${currentLevel.sheets} paper${currentLevel.sheets>1?'s':''} • Step ${currentStep+1}/${currentLevel.steps.length}`;
 }
 function nextStep() {
-  if (currentStep < currentLevel.steps.length-1) { currentStep++; renderStep(); }
+  const steps = currentLevel._detailed || currentLevel.steps;
+  if (currentStep < steps.length-1) { currentStep++; renderStep(); }
   else {
     toast('Now fold it IRL and scan! 📸');
     document.querySelector('#foldModal .grid')?.scrollIntoView({behavior:'smooth'});
