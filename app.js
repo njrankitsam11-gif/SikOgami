@@ -443,7 +443,7 @@ function getStepSvg(type){
     "cube-final": base(`<path d="M30 30 L60 30 L75 45 L75 70 L45 70 L30 55 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M30 30 L45 45 L75 45 L60 30" fill="${paperBack}" stroke="${stroke}"/><path d="M45 45 L45 70" stroke="${stroke}" opacity="0.5"/>`),
     "star-final": base(`<path d="M50 12 L61 40 L88 40 L66 56 L74 84 L50 68 L26 84 L34 56 L12 40 L39 40 Z" fill="#FACC15" stroke="${stroke}" stroke-width="1"/>`),
     "dragon-final": base(`<path d="M20 50 Q35 30 50 50 Q65 70 85 50 L80 45 Q65 60 50 40 Q35 60 20 50" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M85 50 L90 42 L84 48" fill="none" stroke="${stroke}"/>`),
-    "castle-final": base(`<rect x="25" y="50" width="50" height="25" fill="${paper}" stroke="${stroke}"/><rect x="30" y="35" width="12" height="15" fill="${paperBack}" stroke="${stroke}"/><rect x="58" y="35" width="12" height="15" fill="${paperBack}" stroke="${stroke}"/><path d="M25 50 L75 50 L70 45 L30 45 Z" fill="${stroke}" opacity="0.2"/>`)
+    "castle-final": base(`<rect x="25" y="50" width="50" height="25" fill="${paper}" stroke="${stroke}"/><rect x="30" y="35" width="12" height="15" fill="${paperBack}" stroke="${stroke}"/><rect x="58" y="35" width="12" height="15" fill="${paperBack}" stroke="${stroke}"/><path d="M25 50 L75 50 L70 45 L30 45 Z" fill="${stroke}" opacity="0.2"/>`),
     "default": base(sq, "")
   };
   const inner = maps[type] || maps["default"];
