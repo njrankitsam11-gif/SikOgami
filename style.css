@@ -70,3 +70,15 @@ html.dark footer { background: #0A0A0A !important; border-color: #222 !important
 html.dark ::-webkit-scrollbar-thumb { background: #333; }
 html.dark ::-webkit-scrollbar-track { background: #111; }
 html.dark #garden ::-webkit-scrollbar-track { background: #0A0A0A; }
+
+/* ——— ZEN MODE ——— light + dark both visible */
+.zen-bg { background: #FDFBF7; color: #0A0A0A; }
+.zen-bg .bg-white { background: #FFFFFF !important; }
+.zen-bg .bg-cream { background: #FFF8E7 !important; }
+html.dark .zen-bg { background: #0A0A0A !important; color: #FDFBF7 !important; }
+html.dark .zen-bg .bg-white { background: #1A1A1A !important; }
+html.dark .zen-bg .bg-cream { background: #1E1E1E !important; }
+html.dark .zen-bg .border-ink { border-color: #333 !important; }
+html.dark .zen-bg .text-ink { color: #FDFBF7 !important; }
+html.dark .zen-bg .bg-ink { background: #FDFBF7 !important; color: #0A0A0A !important; }
+html.dark .zen-bg select { background: #1A1A1A !important; color: #FDFBF7 !important; border-color: #333 !important; }

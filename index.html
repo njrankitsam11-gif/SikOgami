@@ -460,17 +460,48 @@ tailwind.config = {
 <!-- Toast -->
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink text-paper px-6 py-3 font-mono text-xs tracking-wide shadow-xl translate-y-[150%] transition duration-300 z-[110]">Added!</div>
 
-<!-- Zen Overlay -->
-<div id="zenOverlay" class="fixed inset-0 z-[90] hidden bg-[#FDFBF7]">
-  <div class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-    <button onclick="toggleZen()" class="absolute top-6 right-6 w-10 h-10 border-2 border-ink flex items-center justify-center">✕</button>
-    <div class="text-[11px] font-mono tracking-[0.2em]">ZEN MODE • BREATHE WITH THE PAPER</div>
-    <div class="mt-6 w-[280px] h-[280px] bg-white border-2 border-ink shadow-[8px_8px_0px_#0A0A0A] flex items-center justify-center relative overflow-hidden">
-      <div id="breathingPaper" class="w-32 h-32 bg-cream border-2 border-ink shadow-sm flex items-center justify-center text-4xl transition-transform duration-4000">📄</div>
-      <div class="absolute bottom-2 font-mono text-[10px] tracking-widest" id="breathText">INHALE • 4s</div>
+<!-- Zen Overlay — IMMERSIVE + DARK FIX -->
+<div id="zenOverlay" class="fixed inset-0 z-[90] hidden">
+  <div class="absolute inset-0 bg-paper text-ink flex flex-col zen-bg">
+    <!-- Top bar -->
+    <div class="h-[64px] border-b-2 border-ink/10 flex items-center justify-between px-6 shrink-0">
+      <div class="flex items-center gap-3">
+        <span class="text-[11px] font-mono tracking-[0.2em]">ZEN MODE • BREATHE WITH PAPER</span>
+        <span id="zenTimer" class="hidden md:inline-flex bg-ink text-paper text-[11px] font-mono px-2 py-1">00:00</span>
+        <span id="zenSession" class="hidden md:inline-flex bg-sage text-ink text-[10px] font-mono px-2 py-1 border border-ink">SESSION: 2 MIN</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleZenSound()" id="zenSoundBtn" class="w-9 h-9 border-2 border-ink flex items-center justify-center text-sm hover:bg-ink hover:text-paper transition" title="Sound">🔇</button>
+        <button onclick="toggleZen()" class="w-10 h-10 bg-ink text-paper flex items-center justify-center hover:bg-sick transition">✕</button>
+      </div>
     </div>
-    <div class="mt-6 font-serif italic text-xl text-ink/70">"Paper remembers every gentle fold."</div>
-    <button onclick="toggleZen()" class="mt-6 border-2 border-ink px-6 py-2 font-mono text-xs tracking-widest">EXIT ZEN</button>
+    <!-- Center breathing -->
+    <div class="flex-1 flex flex-col items-center justify-center p-6 text-center overflow-auto">
+      <div class="text-[11px] font-mono tracking-[0.2em] opacity-60">TAP THE PAPER • FOLLOW THE BREATH</div>
+      <div class="mt-6 relative">
+        <div class="absolute inset-0 rounded-full border-2 border-ink/10 scale-110"></div>
+        <div class="absolute inset-0 rounded-full border border-ink/5 scale-[1.35]"></div>
+        <div class="w-[300px] h-[300px] md:w-[360px] md:h-[360px] bg-white border-2 border-ink shadow-[10px_10px_0px_#0A0A0A] flex flex-col items-center justify-center relative overflow-hidden paper-grid">
+          <div id="breathingPaper" class="w-36 h-36 bg-cream border-2 border-ink shadow-md flex items-center justify-center text-5xl transition-transform duration-4000">📄</div>
+          <div class="mt-4 font-black tracking-widest text-sm" id="breathText">INHALE • 4s</div>
+          <div class="text-[11px] font-mono opacity-60" id="breathCount">1 • Cycle</div>
+          <div class="absolute bottom-3 left-3 right-3 flex justify-between text-[9px] font-mono tracking-widest opacity-40"><span>INHALE</span><span>EXHALE</span></div>
+        </div>
+      </div>
+      <!-- Controls -->
+      <div class="mt-6 flex flex-wrap gap-2 justify-center">
+        <button onclick="toggleZenPlay()" id="zenPlayBtn" class="bg-sick text-white px-6 py-2.5 font-black text-xs tracking-widest border-2 border-ink hover:bg-ink transition">⏸︎ PAUSE</button>
+        <button onclick="zenReset()" class="border-2 border-ink px-6 py-2.5 font-mono text-xs tracking-widest hover:bg-ink hover:text-paper transition">RESET</button>
+        <select id="zenPattern" onchange="zenChangePattern(this.value)" class="border-2 border-ink px-3 py-2.5 font-mono text-xs bg-white">
+          <option value="4-6">4s IN • 6s OUT (Calm)</option>
+          <option value="4-4">4s • 4s (Balanced)</option>
+          <option value="4-7-8">4-7-8 (Deep)</option>
+        </select>
+      </div>
+      <div class="mt-4 font-serif italic text-lg opacity-70" id="zenQuote">"Paper remembers every gentle fold."</div>
+      <div class="mt-2 text-[11px] font-mono opacity-50 max-w-[480px]">Fold a scrap nearby and breathe — no score, no scan, just paper and air. Dark mode dims the page so text stays visible.</div>
+      <button onclick="toggleZen()" class="mt-6 border-2 border-ink px-6 py-2 font-mono text-xs tracking-widest hover:bg-ink hover:text-paper transition">EXIT ZEN →</button>
+    </div>
   </div>
 </div>
 

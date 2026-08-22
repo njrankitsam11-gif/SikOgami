@@ -909,36 +909,96 @@ function updateThemeIcon(){
   btn.title = isDark ? 'Light mode' : 'Dark mode';
 }
 
-// Zen
-let zenInterval=null; let breathIn=true;
+// Zen — improved immersive breathing + timer + dark fix
+let zenInterval=null, zenTimerInterval=null, zenPlaying=true, breathIn=true, zenSeconds=0, zenCount=1, zenPattern='4-6';
+const zenQuotes=["Paper remembers every gentle fold.","Breathe in the crease, out the calm.","One fold at a time, no rush.","Your garden grows with each breath.","Inhale paper, exhale stress."];
 function toggleZen(){
   const z=document.getElementById('zenOverlay');
   const isHidden=z.classList.contains('hidden');
   if(isHidden){
     z.classList.remove('hidden');
     document.body.style.overflow='hidden';
-    document.getElementById('zenBtn').textContent='● ZEN MODE';
-    startBreathing();
+    const btn=document.getElementById('zenBtn'); if(btn) btn.textContent='● ZEN MODE';
+    zenSeconds=0; zenCount=1; breathIn=true; zenPlaying=true;
+    const pb=document.getElementById('zenPlayBtn'); if(pb) pb.textContent='⏸︎ PAUSE';
+    startBreathing(); startZenTimer();
+    const q=document.getElementById('zenQuote'); if(q) q.textContent='"'+zenQuotes[Math.floor(Math.random()*zenQuotes.length)]+'"';
   } else {
     z.classList.add('hidden');
     document.body.style.overflow='';
-    document.getElementById('zenBtn').textContent='○ ZEN MODE';
-    stopBreathing();
+    const btn=document.getElementById('zenBtn'); if(btn) btn.textContent='○ ZEN MODE';
+    stopBreathing(); stopZenTimer();
   }
+}
+function getZenTimings(){
+  if(zenPattern==='4-4') return {in:4, out:4};
+  if(zenPattern==='4-7-8') return {in:4, hold:7, out:8};
+  return {in:4, out:6}; // default 4-6
 }
 function startBreathing(){
   const el=document.getElementById('breathingPaper');
   const txt=document.getElementById('breathText');
+  const cnt=document.getElementById('breathCount');
+  if(!el||!txt) return;
   el.classList.add('breathing');
-  zenInterval=setInterval(()=>{
+  const timings=getZenTimings();
+  const update=()=>{
+    if(!zenPlaying) return;
     breathIn=!breathIn;
-    txt.textContent= breathIn ? 'INHALE • 4s' : 'EXHALE • 6s';
-    el.textContent= breathIn ? '📄' : '🦢';
-  },4000);
+    if(breathIn){ zenCount++; if(cnt) cnt.textContent=zenCount+' • Cycle'; }
+    const label=breathIn? `INHALE • ${timings.in}s` : `EXHALE • ${timings.out}s`;
+    txt.textContent=label;
+    el.textContent=breathIn? '📄' : '🦢';
+    el.style.transform= breathIn ? 'scale(1.18)' : 'scale(1)';
+    const q=document.getElementById('zenQuote');
+    if(zenCount%4===0 && q) q.textContent='"'+zenQuotes[Math.floor(Math.random()*zenQuotes.length)]+'"';
+  };
+  // initial
+  txt.textContent=`INHALE • ${timings.in}s`;
+  if(cnt) cnt.textContent=zenCount+' • Cycle';
+  el.textContent='📄';
+  const total= timings.hold ? timings.in+timings.hold+timings.out : timings.in+timings.out;
+  zenInterval=setInterval(update, total*1000/2); // half cycle (in/out)
 }
 function stopBreathing(){
-  clearInterval(zenInterval);
-  document.getElementById('breathingPaper').classList.remove('breathing');
+  clearInterval(zenInterval); zenInterval=null;
+  const el=document.getElementById('breathingPaper');
+  if(el) { el.classList.remove('breathing'); el.style.transform=''; }
+}
+function startZenTimer(){
+  const el=document.getElementById('zenTimer');
+  zenTimerInterval=setInterval(()=>{
+    if(!zenPlaying) return;
+    zenSeconds++;
+    if(el){
+      const m=String(Math.floor(zenSeconds/60)).padStart(2,'0');
+      const s=String(zenSeconds%60).padStart(2,'0');
+      el.textContent=`${m}:${s}`;
+    }
+  },1000);
+}
+function stopZenTimer(){ clearInterval(zenTimerInterval); zenTimerInterval=null; }
+function toggleZenPlay(){
+  zenPlaying=!zenPlaying;
+  const b=document.getElementById('zenPlayBtn');
+  if(b) b.textContent= zenPlaying? '⏸︎ PAUSE' : '▶ RESUME';
+  const el=document.getElementById('breathingPaper');
+  if(el) el.style.opacity= zenPlaying? '1' : '0.6';
+}
+function zenReset(){
+  zenSeconds=0; zenCount=1; breathIn=true;
+  const t=document.getElementById('zenTimer'); if(t) t.textContent='00:00';
+  const c=document.getElementById('breathCount'); if(c) c.textContent='1 • Cycle';
+  const txt=document.getElementById('breathText'); if(txt) txt.textContent='INHALE • 4s';
+  const el=document.getElementById('breathingPaper'); if(el){ el.textContent='📄'; el.style.transform='scale(1)'; }
+}
+function zenChangePattern(v){ zenPattern=v; stopBreathing(); zenCount=1; breathIn=true; if(!document.getElementById('zenOverlay').classList.contains('hidden')) startBreathing(); toast('Pattern: '+v); }
+let zenSound=false;
+function toggleZenSound(){
+  zenSound=!zenSound;
+  const b=document.getElementById('zenSoundBtn');
+  if(b) b.textContent= zenSound? '🔊' : '🔇';
+  toast(zenSound? 'Ambient sound on (mock) — add real audio later' : 'Sound off');
 }
 
 document.addEventListener('DOMContentLoaded', async ()=>{
