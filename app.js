@@ -405,38 +405,40 @@ function isCompleted(id) { return progress.includes(id); }
 
 const TOTAL = LEVELS.length;
 
-// ——— SVG GENERATOR — CLEAN DOTTED CRAFT ———
+// ——— SVG GENERATOR — SHAPE-ACCURATE MORPH ———
 function getStepSvg(type){
-  const paper="#FFF8E7", stroke="#0A0A0A", red="#FF3B30", blue="#1E40AF", sage="#A8D5BA";
-  const base = `<rect x="10" y="10" width="80" height="80" rx="1.5" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/>`;
+  const paper="#FFF8E7", paperBack="#F0E6D3", stroke="#0A0A0A", red="#FF3B30", blue="#1E40AF", sage="#A8D5BA", shadow="rgba(0,0,0,0.08)";
+  const base = (shapePath, lines) => `<svg viewBox="0 0 100 100" class="w-full h-full"><rect x="0" y="0" width="100" height="100" rx="2" fill="${paper}" opacity="0.15"/><g filter="url(#sh)">${shapePath}</g>${lines || ""}<defs><filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="0.8" flood-opacity="0.12"/></filter></defs></svg>`;
+  const sq = `<rect x="12" y="12" width="76" height="76" rx="1.2" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/>`;
   const maps = {
-    "paper-flat": base,
-    "valley-h": base + `<line x1="10" y1="50" x2="90" y2="50" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/><path d="M50 62 L50 72 M45 67 L50 72 L55 67" stroke="${red}" stroke-width="1.2" fill="none"/>`,
-    "valley-h-flap": base + `<path d="M10 50 L90 50 L90 70 L10 70 Z" fill="white" opacity="0.9" stroke="${red}" stroke-dasharray="6 4"/><line x1="10" y1="50" x2="90" y2="50" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/>`,
-    "valley-h-unfold": base + `<line x1="10" y1="50" x2="90" y2="50" stroke="${red}" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/><text x="50" y="85" text-anchor="middle" font-family="monospace" font-size="5" fill="#888">UNFOLD</text>`,
-    "valley-v": base + `<line x1="50" y1="10" x2="50" y2="90" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/>`,
-    "valley-v-unfold": base + `<line x1="50" y1="10" x2="50" y2="90" stroke="${red}" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/><path d="M38 50 L48 50 M45 45 L48 50 L45 55" stroke="${red}" fill="none"/>`,
-    "valley-diag": base + `<line x1="10" y1="90" x2="90" y2="10" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/>`,
-    "valley-diag-unfold": base + `<line x1="10" y1="90" x2="90" y2="10" stroke="${red}" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/>`,
-    "valley-diag-right": base + `<line x1="90" y1="10" x2="50" y2="50" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/><path d="M70 30 L75 25" stroke="${red}" stroke-width="1.2"/>`,
-    "valley-diag-left": base + `<line x1="10" y1="10" x2="50" y2="50" stroke="${red}" stroke-width="1.6" stroke-dasharray="6 4"/>`,
-    "mountain-h": base + `<line x1="10" y1="50" x2="90" y2="50" stroke="${blue}" stroke-width="1.6" stroke-dasharray="2 4"/><path d="M50 38 L50 28 M45 33 L50 28 L55 33" stroke="${blue}" fill="none"/>`,
-    "turn-over": base + `<path d="M30 50 A20 20 0 0 1 70 50" stroke="${stroke}" stroke-width="1.2" fill="none" stroke-dasharray="4 2"/><path d="M65 45 L70 50 L65 55" stroke="${stroke}" fill="none"/><text x="50" y="75" text-anchor="middle" font-size="6" font-family="monospace">TURN OVER ↺</text>`,
-    "tuck-corners": base + `<path d="M10 70 L30 70 L30 90" fill="none" stroke="${blue}" stroke-width="1.4" stroke-dasharray="4 2"/><rect x="10" y="10" width="80" height="80" rx="1.5" fill="none" stroke="${stroke}" stroke-width="0.8" opacity="0.3"/>`,
-    "squash-diamond": `<polygon points="50,10 90,50 50,90 10,50" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/><line x1="50" y1="10" x2="50" y2="90" stroke="${red}" stroke-dasharray="6 4"/><line x1="10" y1="50" x2="90" y2="50" stroke="${red}" stroke-dasharray="6 4"/>`,
-    "petal-curl": base + `<path d="M30 60 Q50 30 70 60" stroke="${red}" fill="none" stroke-dasharray="6 4"/><path d="M50 30 Q55 25 60 30" stroke="${sage}" stroke-width="1.2" fill="none"/>`,
-    "inside-reverse": base + `<path d="M50 10 L50 90" stroke="${blue}" stroke-dasharray="2 4"/><path d="M50 50 L30 70" stroke="${red}" stroke-dasharray="6 4"/>`,
-    "petal-fold": base + `<polygon points="50,10 90,50 50,90 10,50" fill="${paper}" stroke="${stroke}"/><line x1="50" y1="30" x2="50" y2="70" stroke="${red}" stroke-dasharray="6 4"/>`,
-    "open-boat": `<path d="M20 60 L50 30 L80 60 L70 75 L30 75 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/><line x1="30" y1="75" x2="70" y2="75" stroke="${red}" stroke-dasharray="4 2"/>`,
-    "open-cup": `<path d="M30 30 L70 30 L60 75 L40 75 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/>`,
-    "whale-final": `<ellipse cx="50" cy="55" rx="30" ry="15" fill="${paper}" stroke="${stroke}"/><circle cx="65" cy="50" r="2" fill="${stroke}"/>`,
-    "dog-final": `<polygon points="50,20 20,50 30,70 70,70 80,50" fill="${paper}" stroke="${stroke}"/><circle cx="40" cy="50" r="2" fill="${stroke}"/><circle cx="60" cy="50" r="2" fill="${stroke}"/>`,
-    "heart-final": `<path d="M50 75 L20 45 A15 15 0 0 1 50 30 A15 15 0 0 1 80 45 Z" fill="#FF6B6B" stroke="${stroke}"/>`,
-    "default": base
+    "paper-flat": base(sq, `<line x1="12" y1="88" x2="88" y2="88" stroke="${stroke}" stroke-width="0.3" opacity="0.2"/>`),
+    "valley-h": base(`<rect x="12" y="38" width="76" height="38" rx="1" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/><rect x="12" y="38" width="76" height="38" rx="1" fill="${paperBack}" opacity="0.5"/><line x1="12" y1="38" x2="88" y2="38" stroke="${red}" stroke-width="1.5" stroke-dasharray="5 3"/>`, `<path d="M50 55 L50 68 M45 63 L50 68 L55 63" stroke="${red}" stroke-width="1" fill="none"/>`),
+    "valley-h-flap": base(`<path d="M12 28 L88 28 L70 50 L12 50 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M12 50 L88 50 L88 62 L12 62 Z" fill="white" stroke="${red}" stroke-dasharray="5 3" stroke-width="1"/>`, `<line x1="12" y1="50" x2="88" y2="50" stroke="${red}" stroke-width="1.4" stroke-dasharray="5 3"/>`),
+    "valley-h-unfold": base(sq, `<line x1="12" y1="50" x2="88" y2="50" stroke="${red}" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/><text x="50" y="85" text-anchor="middle" font-family="monospace" font-size="4.5" fill="#888">CREASE → UNFOLD</text>`),
+    "valley-v": base(`<line x1="50" y1="12" x2="50" y2="88" stroke="${red}" stroke-width="1.5" stroke-dasharray="5 3"/>` + sq, ""),
+    "valley-v-unfold": base(sq, `<line x1="50" y1="12" x2="50" y2="88" stroke="${red}" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>`),
+    "valley-diag": base(`<polygon points="12,88 88,88 88,12" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><line x1="12" y1="88" x2="88" y2="12" stroke="${red}" stroke-width="1.5" stroke-dasharray="5 3"/>`),
+    "valley-diag-unfold": base(sq, `<line x1="12" y1="88" x2="88" y2="12" stroke="${red}" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>`),
+    "valley-diag-right": base(`<path d="M12 12 L88 12 L88 88 L12 88 Z M88 12 L50 38 L70 50 L88 12" fill="${paper}" stroke="${stroke}" stroke-width="1"/><path d="M88 12 L50 38" stroke="${red}" stroke-width="1.4" stroke-dasharray="5 3"/>`, `<path d="M70 30 L75 25" stroke="${red}" fill="none"/>`),
+    "valley-diag-left": base(`<path d="M12 12 L88 12 L88 88 L12 88 Z M12 12 L50 38 L30 50 L12 12" fill="${paper}" stroke="${stroke}" stroke-width="1"/><path d="M12 12 L50 38" stroke="${red}" stroke-width="1.4" stroke-dasharray="5 3"/>`),
+    "mountain-h": base(`<rect x="12" y="12" width="76" height="76" rx="1.2" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><line x1="12" y1="50" x2="88" y2="50" stroke="${blue}" stroke-width="1.5" stroke-dasharray="2 4"/><path d="M50 38 L50 28 M45 33 L50 28 L55 33" stroke="${blue}" fill="none"/>`, ""),
+    "turn-over": base(`<path d="M15 45 Q50 20 85 45 Q50 70 15 45" fill="${paper}" stroke="${stroke}" stroke-width="1.1" opacity="0.9"/><path d="M30 50 A20 20 0 0 1 70 50" stroke="${stroke}" stroke-width="1.1" fill="none" stroke-dasharray="4 2"/><text x="50" y="78" text-anchor="middle" font-size="5.5" font-family="monospace" fill="${stroke}">TURN OVER ↺</text>`),
+    "tuck-corners": base(`<path d="M12 28 L88 28 L70 50 L30 50 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M12 50 L30 50 L30 64 L12 64" fill="white" stroke="${blue}" stroke-dasharray="4 2"/><path d="M70 50 L88 50 L88 64 L70 64" fill="white" stroke="${blue}" stroke-dasharray="4 2"/>`),
+    "squash-diamond": base(`<polygon points="50,12 88,50 50,88 12,50" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/><polygon points="50,12 88,50 50,50 50,12" fill="${paperBack}" opacity="0.6"/><line x1="50" y1="12" x2="50" y2="88" stroke="${red}" stroke-dasharray="5 3"/><line x1="12" y1="50" x2="88" y2="50" stroke="${red}" stroke-dasharray="5 3"/>`),
+    "petal-curl": base(`<path d="M30 60 Q50 30 70 60 L65 70 L35 70 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M30 60 Q50 30 70 60" stroke="${red}" fill="none" stroke-dasharray="5 3"/>`),
+    "inside-reverse": base(`<path d="M12 12 L88 12 L50 50 L12 12" fill="${paper}" stroke="${stroke}"/><path d="M50 12 L50 50" stroke="${blue}" stroke-dasharray="2 4"/><path d="M50 50 L30 70" stroke="${red}" stroke-dasharray="5 3"/>`),
+    "petal-fold": base(`<polygon points="50,12 88,50 50,88 12,50" fill="${paper}" stroke="${stroke}"/><line x1="50" y1="30" x2="50" y2="70" stroke="${red}" stroke-dasharray="5 3"/><path d="M50 30 L65 45 L50 60" fill="white" opacity="0.7" stroke="${red}" stroke-dasharray="4 2"/>`),
+    "open-boat": base(`<path d="M18 62 L50 28 L82 62 L72 76 L28 76 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/><path d="M28 76 L72 76" stroke="${stroke}" stroke-width="0.8" opacity="0.4"/><line x1="28" y1="76" x2="72" y2="76" stroke="${red}" stroke-dasharray="4 2"/><path d="M50 28 L50 76" stroke="${stroke}" stroke-width="0.6" opacity="0.15"/>`),
+    "open-cup": base(`<path d="M30 28 L70 28 L64 74 L36 74 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.2"/><path d="M36 74 L64 74" stroke="${stroke}" stroke-width="1" opacity="0.3"/>`),
+    "whale-final": base(`<path d="M15 55 Q50 35 85 55 Q70 70 50 68 Q30 70 15 55" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><ellipse cx="68" cy="52" rx="6" ry="4" fill="${paperBack}" stroke="${stroke}" stroke-width="0.6"/><circle cx="70" cy="50" r="1.3" fill="${stroke}"/>`),
+    "dog-final": base(`<path d="M50 18 L18 48 L28 70 L72 70 L82 48 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M18 48 L35 35 L28 48" fill="${paperBack}"/><path d="M82 48 L65 35 L72 48" fill="${paperBack}"/><circle cx="40" cy="52" r="1.5" fill="${stroke}"/><circle cx="60" cy="52" r="1.5" fill="${stroke}"/><ellipse cx="50" cy="60" rx="3" ry="2" fill="${stroke}"/>`),
+    "heart-final": base(`<path d="M50 76 L22 46 A13 13 0 0 1 50 30 A13 13 0 0 1 78 46 Z" fill="#FF6B6B" stroke="${stroke}" stroke-width="1.1"/>`),
+    "default": base(sq, "")
   };
   const inner = maps[type] || maps["default"];
-  return `<svg viewBox="0 0 100 100" class="w-full h-full">${inner}</svg>`;
+  return `<svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
 }
+
 
 // Deepen shallow levels 4→8 via micro-steps (keeps L1 10 as is)
 function getDetailedSteps(level){
