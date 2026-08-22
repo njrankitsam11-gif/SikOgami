@@ -433,6 +433,17 @@ function getStepSvg(type){
     "whale-final": base(`<path d="M15 55 Q50 35 85 55 Q70 70 50 68 Q30 70 15 55" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><ellipse cx="68" cy="52" rx="6" ry="4" fill="${paperBack}" stroke="${stroke}" stroke-width="0.6"/><circle cx="70" cy="50" r="1.3" fill="${stroke}"/>`),
     "dog-final": base(`<path d="M50 18 L18 48 L28 70 L72 70 L82 48 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M18 48 L35 35 L28 48" fill="${paperBack}"/><path d="M82 48 L65 35 L72 48" fill="${paperBack}"/><circle cx="40" cy="52" r="1.5" fill="${stroke}"/><circle cx="60" cy="52" r="1.5" fill="${stroke}"/><ellipse cx="50" cy="60" rx="3" ry="2" fill="${stroke}"/>`),
     "heart-final": base(`<path d="M50 76 L22 46 A13 13 0 0 1 50 30 A13 13 0 0 1 78 46 Z" fill="#FF6B6B" stroke="${stroke}" stroke-width="1.1"/>`),
+    "butterfly-final": base(`<path d="M50 30 Q30 45 20 55 Q30 65 50 50 M50 30 Q70 45 80 55 Q70 65 50 50" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><line x1="50" y1="30" x2="50" y2="55" stroke="${stroke}" stroke-width="0.8"/>`),
+    "crane-final": base(`<path d="M35 65 L50 30 L65 65 M50 30 L35 45 M50 30 L65 45 M35 65 Q50 75 65 65" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M50 30 L48 22" stroke="${stroke}" stroke-width="0.9"/>`),
+    "frog-final": base(`<ellipse cx="50" cy="60" rx="22" ry="14" fill="${paper}" stroke="${stroke}"/><ellipse cx="35" cy="70" rx="7" ry="9" fill="${paper}" stroke="${stroke}"/><ellipse cx="65" cy="70" rx="7" ry="9" fill="${paper}" stroke="${stroke}"/><circle cx="42" cy="50" r="2" fill="${stroke}"/><circle cx="58" cy="50" r="2" fill="${stroke}"/>`),
+    "tulip-final": base(`<path d="M50 30 Q35 45 38 60 Q50 70 62 60 Q65 45 50 30" fill="#FF6B6B" stroke="${stroke}" stroke-width="1"/><path d="M50 70 L50 85" stroke="#22c55e" stroke-width="1.5"/>`),
+    "fox-final": base(`<path d="M50 22 L20 50 L28 72 L72 72 L80 50 Z" fill="#FB923C" stroke="${stroke}" stroke-width="1.1"/><polygon points="20,50 30,35 28,50" fill="white" stroke="${stroke}"/><polygon points="80,50 70,35 72,50" fill="white" stroke="${stroke}"/><ellipse cx="50" cy="62" rx="3" ry="2.5" fill="white" stroke="${stroke}"/>`),
+    "fish-final": base(`<path d="M15 50 Q30 30 50 50 Q30 70 15 50 M70 40 Q60 50 70 60" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><circle cx="35" cy="48" r="1.5" fill="${stroke}"/>`),
+    "penguin-final": base(`<ellipse cx="50" cy="55" rx="18" ry="24" fill="${stroke}" stroke="${stroke}"/><ellipse cx="50" cy="65" rx="10" ry="12" fill="white"/><polygon points="50,45 46,50 54,50" fill="#FFB000" stroke="${stroke}"/>`),
+    "cube-final": base(`<path d="M30 30 L60 30 L75 45 L75 70 L45 70 L30 55 Z" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M30 30 L45 45 L75 45 L60 30" fill="${paperBack}" stroke="${stroke}"/><path d="M45 45 L45 70" stroke="${stroke}" opacity="0.5"/>`),
+    "star-final": base(`<path d="M50 12 L61 40 L88 40 L66 56 L74 84 L50 68 L26 84 L34 56 L12 40 L39 40 Z" fill="#FACC15" stroke="${stroke}" stroke-width="1"/>`),
+    "dragon-final": base(`<path d="M20 50 Q35 30 50 50 Q65 70 85 50 L80 45 Q65 60 50 40 Q35 60 20 50" fill="${paper}" stroke="${stroke}" stroke-width="1.1"/><path d="M85 50 L90 42 L84 48" fill="none" stroke="${stroke}"/>`),
+    "castle-final": base(`<rect x="25" y="50" width="50" height="25" fill="${paper}" stroke="${stroke}"/><rect x="30" y="35" width="12" height="15" fill="${paperBack}" stroke="${stroke}"/><rect x="58" y="35" width="12" height="15" fill="${paperBack}" stroke="${stroke}"/><path d="M25 50 L75 50 L70 45 L30 45 Z" fill="${stroke}" opacity="0.2"/>`)
     "default": base(sq, "")
   };
   const inner = maps[type] || maps["default"];
@@ -442,30 +453,51 @@ function getStepSvg(type){
 
 // Deepen shallow levels 4→8 via micro-steps (keeps L1 10 as is)
 function getDetailedSteps(level){
-  if(level.steps.length >= 8) return level.steps; // already deep (L1)
+  if(level.steps.length >= 8) return level.steps; // already deep (L1-L6)
+  // Level-specific accurate morph sequences (shape-accurate)
+  const map = {
+    "BUTTERFLY": ["paper-flat","valley-v-unfold","squash-diamond","squash-diamond","valley-h-unfold","mountain-h","petal-curl","butterfly-final"],
+    "FOX FACE": ["paper-flat","valley-v-unfold","valley-diag-left","valley-diag-right","mountain-h","valley-h-flap","turn-over","fox-final"],
+    "JUMPING FROG": ["paper-flat","squash-diamond","valley-diag-unfold","valley-diag-right","valley-diag-left","mountain-h","valley-h-flap","frog-final"],
+    "CRANE": ["paper-flat","valley-v-unfold","petal-fold","turn-over","inside-reverse","inside-reverse","valley-h-flap","crane-final"],
+    "FISH": ["paper-flat","valley-diag-unfold","valley-diag-right","valley-diag-left","turn-over","inside-reverse","petal-curl","fish-final"],
+    "PENGUIN": ["paper-flat","squash-diamond","valley-diag-right","valley-diag-left","mountain-h","tuck-corners","petal-curl","penguin-final"],
+    "MODULAR CUBE": ["paper-flat","valley-diag","tuck-corners","squash-diamond","valley-h","turn-over","tuck-corners","cube-final"],
+    "5-PETAL STAR": ["paper-flat","valley-h-unfold","valley-v-unfold","squash-diamond","petal-curl","turn-over","tuck-corners","star-final"],
+    "DRAGON": ["paper-flat","squash-diamond","petal-fold","inside-reverse","mountain-h","tuck-corners","petal-curl","dragon-final"],
+    "SIKOGAMI CASTLE": ["paper-flat","valley-h","valley-v","squash-diamond","tuck-corners","turn-over","petal-curl","castle-final"],
+  };
+  const seq = map[level.title];
+  if(seq){
+    const orig = level.steps;
+    const expanded = seq.map((svgType, i) => {
+      const base = orig[Math.min(i, orig.length-1)];
+      const isFinal = i===seq.length-1;
+      return {
+        title: isFinal? `Final ${level.title} — Morph Complete` : base.title + (i>0? ` • Step ${i+1}`: ""),
+        desc: isFinal? `Morph complete! ${level.emoji} Your ${level.title.toLowerCase()} now stands as ${level.sheets} paper(s) united. Compare silhouette to photo for scan.` : base.desc,
+        emoji: isFinal? level.emoji : base.emoji,
+        visual: isFinal? `${level.title} final silhouette` : base.visual,
+        svgType: svgType
+      };
+    });
+    return expanded;
+  }
+  // Generic fallback 4→8 with shape morphed finals
   const orig = level.steps;
-  // Expand 4 → 8: insert UNFOLD, TURN OVER, CREASE hints
   const expanded = [];
+  const genericSeq = ["paper-flat","valley-h-unfold","valley-v-unfold","squash-diamond","valley-diag-right","turn-over","petal-curl", level.emoji==="🏯"?"castle-final": level.emoji==="🐉"?"dragon-final": level.emoji==="🌟"?"star-final": level.emoji==="🧊"?"cube-final": "open-boat"];
   orig.forEach((s, idx) => {
-    const svg = s.svgType || (idx===0? "paper-flat" : idx%3===0? "turn-over" : idx%2===0? "valley-diag-right" : "valley-h");
+    const svg = s.svgType || genericSeq[Math.min(idx, genericSeq.length-1)];
     expanded.push({...s, svgType: svg});
-    // after each fold except last, insert micro-step
     if(idx < orig.length -1){
-      if(idx===0){
-        expanded.push({title:"Crease & Guide", desc:"Crease firmly with nail, then UNFOLD. Red dotted becomes faint guide — don't press hard.", emoji:"✚", visual:"Unfold guide", svgType:"valley-h-unfold"});
-      } else if(idx===1){
-        expanded.push({title:"Mirror & Check", desc:"Mirror fold opposite side. Check symmetry — edges meet center, no gap.", emoji:"↔️", visual:"Mirror check", svgType:"valley-diag-left"});
-      } else if(idx===2){
-        expanded.push({title:"Turn Over", desc:"Flip paper over (↺). Mountain on back becomes valley front. Smooth.", emoji:"↺", visual:"Turn over", svgType:"turn-over"});
-      }
+      if(idx===0) expanded.push({title:"Crease & Guide", desc:"Crease firmly, then UNFOLD. Guide stays faint.", emoji:"✚", visual:"Unfold", svgType:"valley-h-unfold"});
+      else if(idx===1) expanded.push({title:"Mirror Check", desc:"Mirror opposite side, check alignment.", emoji:"↔️", visual:"Mirror", svgType:"valley-diag-left"});
+      else if(idx===2) expanded.push({title:"Turn Over", desc:"Flip ↺, continue on back.", emoji:"↺", visual:"Turn", svgType:"turn-over"});
     }
   });
-  // Ensure 8-9 length: if still <8, pad with finalize
-  while(expanded.length < 8){
-    expanded.push({title:"Shape & Soften", desc:"Soften curves with thumb, not nail. Paper remembers gentle pressure.", emoji:"🤲", visual:"Soften", svgType:"petal-curl"});
-  }
-  // Cap to 10
-  return expanded.slice(0,10);
+  while(expanded.length < 8) expanded.push({title:"Refine Shape", desc:`Soften & shape toward final ${level.emoji}`, emoji:level.emoji, visual:"Refine", svgType: genericSeq[6]});
+  return expanded.slice(0,8);
 }
 
 
