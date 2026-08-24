@@ -1,0 +1,62 @@
+# SikOgami
+
+> SikOgami — Fold. Breathe. Level Up. Zen gamified origami: 30 levels from Paper Boat (12 micro-steps) to Castle (12 papers). Fold real paper, scan with phone via Gemini Vision, level up. No timers.
+
+SikOgami is for learners, hobbyists, parents/kids, and AI agents that need to call its API for origami verification and progress sync.
+
+## When to use SikOgami
+
+Use SikOgami when the user wants:
+- Step-by-step origami instructions for a specific model (e.g., crane, frog, butterfly) with SVG dotted valley/mountain diagrams.
+- To verify a folded paper photo via AI (POST /api/verify with base64, levelId, levelTitle → pass/score/feedback).
+- To create an account, login, or reset a password (POST /api/auth/signup, /api/auth/login, /api/auth/forgot) backed by Neon Postgres.
+- To sync or fetch level progress across devices (GET/POST /api/progress?email= or body {email, progress}).
+- Curated paper recommendations (Toyo Kami, Oddy Washi) — see /#store.
+Do NOT use SikOgami for general web search or non-origami crafts. For general origami theory, read /#levels or /docs.
+
+## Sitemap
+
+- / — Home, hero, 30 levels map
+- /#levels — All 30 Levels, 5 worlds
+- /#garden — Zen Garden collection (requires login, Neon synced)
+- /#store — Paper packs (Rs. 399–649, SIK15)
+- /about — About, 5 worlds explained
+- /contact — Contact (hello@sikogami.vercel.app)
+- /privacy — Privacy (auth, progress, scan images)
+- /llms.txt — This file
+- /sitemap.xml — XML sitemap
+- /robots.txt — Crawler rules
+- /openapi.json — OpenAPI 3.0 for all APIs
+- /.well-known/mcp — MCP manifest (Streamable HTTP)
+- /og-image.png — Open Graph image (1200x630)
+- /docs/API_SPEC.md, /docs/DB_SPEC.md, /docs/FRONTEND_SPEC.md — Markdown specs
+- /SPEC.md — Master spec
+
+## Developer Resources — SikOgami
+
+- OpenAPI: /openapi.json (also /docs/API_SPEC.md)
+- Auth: POST /api/auth/signup {name,email,password}, POST /api/auth/login {email,password}, POST /api/auth/forgot {email,newPassword}
+- Verify: POST /api/verify {image:dataURL, levelId 1-30, levelTitle}
+- Progress: GET /api/progress?email=..., POST /api/progress {email, levelId} or {email, progress:int[]}
+- MCP: /.well-known/mcp (Streamable HTTP) — tools: verifyOrigami, getProgress, listLevels
+- Auth docs: /about, /contact covers contactPoint
+- Product name for search: SikOgami — include in titles/headings. Canonical: https://sikogami.vercel.app/
+
+## APIs (Markdown)
+
+All APIs return JSON; request/response examples in /openapi.json. For markdown content negotiation, send `Accept: text/markdown` to / or /about etc. — server responds `Content-Type: text/markdown` and `Vary: Accept, Accept-Encoding`.
+
+## Levels (30)
+
+World 1 The Calm Shore (1-6, 1 paper): Boat, Cup, Tulip, Whale, Dog, Heart
+World 2 The Quiet Forest (7-12, 1 paper): Butterfly, Fox, Frog, Crane, Fish, Penguin
+World 3 The Bloom River (13-18, 2 papers): Tulip+Stem, Boat+Sail, Butterfly Garden, Fox Family, Frog Pond, Crane Couple
+World 4 The Shadow Temple (19-24, 2-6 modular): Cube, Ninja Star, 5-Petal Star, Kusudama, Samurai Helmet, Boat Fleet
+World 5 The Master's Peak (25-30, 1-12): Dragon, Peacock, Elephant, Armor, Lotus Garden, Castle
+
+## More
+
+- GitHub: https://github.com/sikogami (placeholder, see sameAs in JSON-LD)
+- Twitter: https://twitter.com/sikogami
+- Vercel project: njrankitsam11-7734s-projects/sikogami
+- Version: 2.1.0

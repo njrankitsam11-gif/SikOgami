@@ -1,7 +1,63 @@
 {
-  "functions": {
-    "api/verify.js": {
-      "maxDuration": 10
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "destination": "/llms.txt"
+    },
+    {
+      "source": "/about",
+      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "destination": "/about.md"
+    },
+    {
+      "source": "/contact",
+      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "destination": "/contact.md"
+    },
+    {
+      "source": "/privacy",
+      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "destination": "/privacy.md"
     }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Vary", "value": "Accept, Accept-Encoding" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    },
+    {
+      "source": "/llms.txt",
+      "headers": [{ "key": "Content-Type", "value": "text/markdown; charset=utf-8" }]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [{ "key": "Content-Type", "value": "application/xml" }]
+    },
+    {
+      "source": "/openapi.json",
+      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+    },
+    {
+      "source": "/(.*).md",
+      "headers": [{ "key": "Content-Type", "value": "text/markdown; charset=utf-8" }]
+    },
+    {
+      "source": "/.well-known/mcp",
+      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+    },
+    {
+      "source": "/.well-known/mcp.json",
+      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+    }
+  ],
+  "functions": {
+    "api/verify.js": { "maxDuration": 10 },
+    "api/progress.js": { "maxDuration": 10 },
+    "api/mcp.js": { "maxDuration": 5 }
   }
 }

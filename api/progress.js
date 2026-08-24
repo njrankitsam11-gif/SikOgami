@@ -2,9 +2,17 @@ import { getSql, ensureUsersTable, ensureProgressTable } from './lib/db.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Vary', 'Accept, Accept-Encoding');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  // Markdown negotiation: if agent asks for markdown, return markdown variant
+  const accept = req.headers.accept || '';
+  const wantsMarkdown = accept.includes('text/markdown');
+  if (wantsMarkdown && req.method === 'GET') {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    return res.status(200).send(`# SikOgami API\n\nEndpoint: ${req.url}\nSee /openapi.json for JSON usage.`);
+  }
 
   const sql = getSql();
   if (!sql) return res.status(200).json({ ok: true, fallback: true, progress: [] });

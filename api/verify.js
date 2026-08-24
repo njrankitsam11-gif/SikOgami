@@ -6,9 +6,17 @@
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Vary', 'Accept, Accept-Encoding');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  // Markdown negotiation: if agent asks for markdown, return markdown variant
+  const accept = req.headers.accept || '';
+  const wantsMarkdown = accept.includes('text/markdown');
+  if (wantsMarkdown && req.method === 'GET') {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    return res.status(200).send(`# SikOgami API\n\nEndpoint: ${req.url}\nSee /openapi.json for JSON usage.`);
+  }
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
   try {

@@ -1,0 +1,45 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SikOgami API",
+    "description": "SikOgami — Fold. Breathe. Level Up. 30-level zen origami with Gemini Vision scan verification. Developer resources for SikOgami.",
+    "version": "2.1.0",
+    "contact": { "name": "SikOgami", "url": "https://sikogami.vercel.app", "email": "hello@sikogami.vercel.app" }
+  },
+  "servers": [{ "url": "https://sikogami.vercel.app", "description": "Production" }],
+  "paths": {
+    "/api/auth/signup": {
+      "post": {
+        "summary": "SikOgami signup",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["name","email","password"], "properties": { "name": {"type":"string"}, "email": {"type":"string","format":"email"}, "password": {"type":"string","minLength":4} } } } } },
+        "responses": { "200": { "description": "ok", "content": { "application/json": { "schema": { "type":"object","properties": {"ok":{"type":"boolean"},"user":{"type":"object"},"fallback":{"type":"boolean"}} } } } }, "409": {"description":"exists"} }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "SikOgami login",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type":"object","required":["email","password"],"properties": {"email":{"type":"string"},"password":{"type":"string"}} } } } },
+        "responses": { "200": { "description":"ok"} }
+      }
+    },
+    "/api/auth/forgot": {
+      "post": {
+        "summary": "SikOgami forgot password",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type":"object","required":["email","newPassword"],"properties": {"email":{"type":"string"},"newPassword":{"type":"string","minLength":4}} } } } },
+        "responses": { "200": {"description":"ok"} }
+      }
+    },
+    "/api/verify": {
+      "post": {
+        "summary": "SikOgami verify origami photo",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type":"object","required":["image","levelId"],"properties": {"image":{"type":"string","description":"data:image/jpeg;base64,..."},"levelId":{"type":"integer","minimum":1,"maximum":30},"levelTitle":{"type":"string"}} } } } },
+        "responses": { "200": { "description": "always 200 with pass/score", "content": { "application/json": { "schema": { "type":"object","properties": {"pass":{"type":"boolean"},"score":{"type":"integer"},"feedback":{"type":"string"},"mode":{"type":"string"},"expected":{"type":"string"}} } } } } }
+      }
+    },
+    "/api/progress": {
+      "get": { "summary": "Get SikOgami progress", "parameters": [{ "name":"email","in":"query","required":true,"schema":{"type":"string"}}], "responses": {"200":{"description":"ok"}} },
+      "post": { "summary": "Sync SikOgami progress", "requestBody": { "required": true, "content": { "application/json": { "schema": { "type":"object","required":["email"],"properties": {"email":{"type":"string"},"levelId":{"type":"integer"},"progress":{"type":"array","items":{"type":"integer"}} } } } }, "responses": {"200":{"description":"ok"}} }
+    },
+    "/.well-known/mcp": { "get": { "summary": "SikOgami MCP manifest", "responses": {"200":{"description":"mcp"}} } }
+  }
+}

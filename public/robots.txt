@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /llms.txt
+Allow: /sitemap.xml
+Allow: /openapi.json
+Allow: /.well-known/mcp
+Sitemap: https://sikogami.vercel.app/sitemap.xml
