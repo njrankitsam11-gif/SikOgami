@@ -60,3 +60,15 @@ World 5 The Master's Peak (25-30, 1-12): Dragon, Peacock, Elephant, Armor, Lotus
 - Twitter: https://twitter.com/sikogami
 - Vercel project: njrankitsam11-7734s-projects/sikogami
 - Version: 2.1.0
+
+## FAQ
+
+See [/faq](/faq) (also [/faq.md](/faq.md)) — 5 Q/A >600 chars on scan, paper, admin unlock, progress sync, dark mode.
+
+## Changelog
+
+See [/CHANGELOG.md](/CHANGELOG.md) and [/SPEC.md](/SPEC.md) for version history.
+
+## Docs Index
+
+See [/docs](/docs) for API_SPEC, DB_SPEC, FRONTEND_SPEC.

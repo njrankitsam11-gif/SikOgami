@@ -20,6 +20,16 @@
       "source": "/privacy",
       "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
       "destination": "/privacy.md"
+    },
+    {
+      "source": "/faq",
+      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "destination": "/faq.md"
+    },
+    {
+      "source": "/docs",
+      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "destination": "/docs/index.html"
     }
   ],
   "headers": [

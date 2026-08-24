@@ -11,6 +11,8 @@ export default async function middleware(request) {
     else if (url.pathname === '/about' || url.pathname === '/about.html') mdPath = '/about.md';
     else if (url.pathname === '/contact' || url.pathname === '/contact.html') mdPath = '/contact.md';
     else if (url.pathname === '/privacy' || url.pathname === '/privacy.html') mdPath = '/privacy.md';
+    else if (url.pathname === '/faq' || url.pathname === '/faq.html') mdPath = '/faq.md';
+    else if (url.pathname === '/docs' || url.pathname === '/docs/' || url.pathname === '/docs/index.html') mdPath = '/docs/index.html';
     else if (url.pathname === '/llms.txt') mdPath = '/llms.txt';
     else if (url.pathname === '/sitemap.xml' || url.pathname === '/robots.txt' || url.pathname === '/openapi.json' || url.pathname.startsWith('/api/') || url.pathname.startsWith('/.well-known/')) mdPath = null;
 
@@ -33,7 +35,7 @@ export default async function middleware(request) {
     }
 
     // Fallback: return 404 markdown for unknown paths
-    const isKnownAsset = url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/about' || url.pathname === '/about.html' || url.pathname === '/contact' || url.pathname === '/contact.html' || url.pathname === '/privacy' || url.pathname === '/privacy.html' || url.pathname === '/llms.txt' || url.pathname === '/sitemap.xml' || url.pathname === '/robots.txt' || url.pathname === '/openapi.json' || url.pathname === '/og-image.png' || url.pathname.startsWith('/api/') || url.pathname.startsWith('/.well-known/') || url.pathname === '/style.css' || url.pathname === '/app.js';
+    const isKnownAsset = url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/about' || url.pathname === '/about.html' || url.pathname === '/contact' || url.pathname === '/contact.html' || url.pathname === '/privacy' || url.pathname === '/privacy.html' || url.pathname === '/faq' || url.pathname === '/faq.html' || url.pathname === '/faq.md' || url.pathname === '/docs' || url.pathname === '/docs/' || url.pathname === '/docs/index.html' || url.pathname === '/CHANGELOG.md' || url.pathname === '/SPEC.md' || url.pathname === '/llms.txt' || url.pathname === '/sitemap.xml' || url.pathname === '/robots.txt' || url.pathname === '/openapi.json' || url.pathname === '/og-image.png' || url.pathname.startsWith('/api/') || url.pathname.startsWith('/.well-known/') || url.pathname.startsWith('/docs/') || url.pathname === '/style.css' || url.pathname === '/app.js';
     if (!isKnownAsset) {
       const body = `# 404 — SikOgami\n\nThat path \`${url.pathname}\` does not exist. Try:\n\n- [Home](/) — SikOgami 30 levels\n- [About](/about)\n- [Contact](/contact)\n- [Privacy](/privacy)\n- [llms.txt](/llms.txt)\n- [sitemap.xml](/sitemap.xml)\n- [openapi.json](/openapi.json)\n- API: POST /api/auth/signup, /api/auth/login, /api/auth/forgot, POST /api/verify, GET/POST /api/progress\n`;
       return new Response(body, {

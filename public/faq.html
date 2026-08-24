@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FAQ — SikOgami</title><link rel="canonical" href="https://sikogami.vercel.app/faq"><meta property="og:type" content="website"><meta property="og:url" content="https://sikogami.vercel.app/faq"><meta property="og:title" content="FAQ — SikOgami"><meta property="og:image" content="https://sikogami.vercel.app/og-image.png"><meta name="description" content="FAQ for SikOgami — scan, paper, levels, admin, sync, dark mode."><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-[#FDFBF7] text-[#0A0A0A] font-mono max-w-3xl mx-auto p-8 leading-relaxed">
+<h1 class="text-4xl font-black tracking-tighter">FAQ — SikOgami</h1>
+<p class="mt-2 text-sm opacity-60">Last updated: 2026-08-24 • 5 answers, >600 chars</p>
+
+<h2 class="font-black mt-6">1. How does scan verification work?</h2>
+<p>Fold real paper following the 8-12 micro-step SVG (red valley, blue mountain, turn-over). Tap <code>SCAN TO LEVEL UP</code>, upload a phone photo. Frontend sends base64 to <code>POST /api/verify {image, levelId, levelTitle}</code>. With <code>GEMINI_API_KEY</code> set, Gemini 1.5 Flash returns <code>{pass, score 0-99, feedback}</code> generous at 75; without key, mock mode returns 88+ and always passes so you never get stuck. Even imperfect folds pass if effort shows.</p>
+
+<h2 class="font-black mt-6">2. What paper do I need? Can I use newspaper?</h2>
+<p>Any paper works — even newspaper — but good paper folds better. Level tips say exact: e.g., Tulip needs one 15×15cm pink Kami, Whale needs light blue, Penguin needs black/white duo. World 3 onward needs 2 papers (Tulip+Stem) up to World 5 Castle 12 papers. Curated packs: Toyo Kami Pastels 60 sheets ₹399, Oddy Washi 30 sheets ₹649, code <code>SIK15</code> for 15% off at /#store.</p>
+
+<h2 class="font-black mt-6">3. How does admin unlock work?</h2>
+<p>Login with <code>admin@sikogami.com</code> / <code>admin123</code> (seeded in Neon <code>sikogami_users.is_admin</code>). <code>app.js:388 isUnlocked()</code> returns true for all 30 if <code>isAdmin()</code>. Normal users unlock linearly <code>progress.includes(id-1)</code>. Progress syncs via <code>POST /api/progress {email, progress:int[]}</code> to Neon <code>sikogami_progress</code> and merges with localStorage.</p>
+
+<h2 class="font-black mt-6">4. How does progress sync across devices?</h2>
+<p>On login, <code>loadProgressFromNeon()</code> GETs <code>/api/progress?email=</code> and merges via <code>Set</code> union sorted, prefers larger set, shows <code>☁️ Neon synced • n/30</code>. On each <code>saveProgress()</code> it POSTs bulk. If offline, localStorage is source of truth, syncs when back online. No cookies, just Neon + localStorage.</p>
+
+<h2 class="font-black mt-6">5. Is Zen Mode different in dark mode?</h2>
+<p>Yes — <code>style.css:60 zen-bg</code> inverts: light <code>#FDFBF7</code> / dark <code>#0A0A0A</code>, with <code>.bg-white</code> → <code>#1A1A1A</code> etc, so text stays visible. Zen has 4-6 Calm, 4-4 Balanced, 4-7-8 Deep patterns, timer 00:00, play/pause, and sound toggle (mock). All SVG paper colors use level color e.g., pink tulip, so you see the real paper.</p>
+
+<p class="mt-6"><a class="underline" href="/">Home</a> • <a class="underline" href="/about">About</a> • <a class="underline" href="/contact">Contact</a> • <a class="underline" href="/privacy">Privacy</a> • <a class="underline" href="/llms.txt">llms.txt</a> • <a class="underline" href="/sitemap.xml">sitemap</a> • <a class="underline" href="/openapi.json">openapi</a></p>
+</body></html>
