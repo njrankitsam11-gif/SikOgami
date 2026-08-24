@@ -1,0 +1,84 @@
+/* SikOgami — Paper Texture & Sick Interactions */
+.paper-texture {
+  position: fixed; inset: 0; pointer-events: none; opacity: 0.04; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+.paper-grid {
+  background-image:
+    linear-gradient(to right, rgba(10,10,10,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(10,10,10,0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.scan-line {
+  position: absolute; left: 0; right: 0; height: 2px; background: #FF3B30;
+  box-shadow: 0 0 10px #FF3B30; opacity: 0.8;
+  animation: scan 2.5s ease-in-out infinite;
+}
+@keyframes scan { 0% { top: 10%; } 50% { top: 85%; } 100% { top: 10%; } }
+.marquee { animation: marquee 20s linear infinite; }
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+
+/* Level card hover */
+.level-card { transition: all 0.2s ease; }
+.level-card:hover { transform: translateY(-4px) rotate(0.4deg); box-shadow: 8px 8px 0px #0A0A0A; }
+.level-card.locked { opacity: 0.55; filter: grayscale(0.2); }
+.level-card.locked:hover { transform: none; box-shadow: none; }
+
+/* breathing */
+@keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+.breathing { animation: breathe 4s ease-in-out infinite; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #0A0A0A; }
+::-webkit-scrollbar-track { background: #F0E6D3; }
+
+/* Garden horizontal scroll snap */
+#gardenGrid { scrollbar-width: thin; scrollbar-color: #FF3B30 #1a1a1a; }
+#gardenGrid::-webkit-scrollbar { height: 6px; }
+#gardenGrid::-webkit-scrollbar-thumb { background: #FF3B30; border-radius: 3px; }
+
+/* DARK MODE */
+html.dark { color-scheme: dark; }
+html.dark body { background: #0A0A0A !important; color: #FDFBF7 !important; }
+html.dark .bg-paper { background-color: #0A0A0A !important; }
+html.dark .bg-white { background-color: #1A1A1A !important; }
+html.dark .bg-cream { background-color: #1E1E1E !important; }
+html.dark .bg-sand { background-color: #242424 !important; }
+html.dark .text-ink { color: #FDFBF7 !important; }
+html.dark .text-ink\/60 { color: rgba(253,251,247,0.6) !important; }
+html.dark .text-ink\/70 { color: rgba(253,251,247,0.7) !important; }
+html.dark .border-ink { border-color: #333 !important; }
+html.dark .border-ink\/10 { border-color: rgba(255,255,255,0.1) !important; }
+html.dark nav { background: rgba(10,10,10,0.8) !important; border-color: #222 !important; }
+html.dark .paper-texture { opacity: 0.06; }
+html.dark .paper-grid { background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px); }
+html.dark .level-card { background: #1A1A1A !important; }
+html.dark #garden { background: #0A0A0A !important; border-top: 1px solid #222; }
+html.dark #garden, html.dark #garden * { color: #FDFBF7; }
+html.dark #garden .text-paper\/60 { color: rgba(253,251,247,0.6) !important; }
+html.dark #garden .text-paper\/50 { color: rgba(253,251,247,0.5) !important; }
+html.dark #garden .text-paper\/40 { color: rgba(253,251,247,0.45) !important; }
+html.dark #garden .text-paper\/70 { color: rgba(253,251,247,0.7) !important; }
+html.dark #garden .border-paper { border-color: rgba(253,251,247,0.25) !important; }
+html.dark #garden .border-paper\/20 { border-color: rgba(253,251,247,0.12) !important; }
+html.dark #garden .bg-white\/10 { background: rgba(255,255,255,0.08) !important; }
+html.dark #garden .bg-white { background: #1A1A1A !important; }
+html.dark #garden .text-sick { color: #FF3B30 !important; }
+html.dark footer { background: #0A0A0A !important; border-color: #222 !important; }
+html.dark ::-webkit-scrollbar-thumb { background: #333; }
+html.dark ::-webkit-scrollbar-track { background: #111; }
+html.dark #garden ::-webkit-scrollbar-track { background: #0A0A0A; }
+
+/* ——— ZEN MODE ——— light + dark both visible */
+.zen-bg { background: #FDFBF7; color: #0A0A0A; }
+.zen-bg .bg-white { background: #FFFFFF !important; }
+.zen-bg .bg-cream { background: #FFF8E7 !important; }
+html.dark .zen-bg { background: #0A0A0A !important; color: #FDFBF7 !important; }
+html.dark .zen-bg .bg-white { background: #1A1A1A !important; }
+html.dark .zen-bg .bg-cream { background: #1E1E1E !important; }
+html.dark .zen-bg .border-ink { border-color: #333 !important; }
+html.dark .zen-bg .text-ink { color: #FDFBF7 !important; }
+html.dark .zen-bg .bg-ink { background: #FDFBF7 !important; color: #0A0A0A !important; }
+html.dark .zen-bg select { background: #1A1A1A !important; color: #FDFBF7 !important; border-color: #333 !important; }
