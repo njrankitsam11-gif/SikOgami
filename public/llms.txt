@@ -26,15 +26,15 @@ Do NOT use SikOgami for general web search or non-origami crafts. For general or
 - /llms.txt — This file
 - /sitemap.xml — XML sitemap
 - /robots.txt — Crawler rules
-- /openapi.json — OpenAPI 3.0 for all APIs
-- /.well-known/mcp — MCP manifest (Streamable HTTP)
+- https://sikogami.vercel.app/openapi.json — OpenAPI 3.0 for all APIs
+- https://sikogami.vercel.app/.well-known/mcp — MCP manifest (Streamable HTTP)
 - /og-image.png — Open Graph image (1200x630)
 - /docs/API_SPEC.md, /docs/DB_SPEC.md, /docs/FRONTEND_SPEC.md — Markdown specs
 - /SPEC.md — Master spec
 
 ## Developer Resources — SikOgami
 
-- OpenAPI: /openapi.json (also /docs/API_SPEC.md) — typed response schemas + Error model for every operation
+- OpenAPI: https://sikogami.vercel.app/openapi.json (also /docs/API_SPEC.md) — typed response schemas + Error model for every operation
 - Docs: /docs (linked from homepage footer)
 - Base URL: https://sikogami.vercel.app/api/v1 (versioned; legacy /api/* aliases kept)
 - Auth: POST /api/v1/auth/signup {name,email,password}, POST /api/v1/auth/login {email,password}, POST /api/v1/auth/forgot {email,newPassword}

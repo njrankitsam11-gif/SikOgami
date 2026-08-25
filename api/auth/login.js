@@ -3,7 +3,7 @@ import { getSql, ensureUsersTable } from '../lib/db.js';
 import { apiHeaders, sendError, sendOk } from '../lib/respond.js';
 
 export default async function handler(req, res) {
-  apiHeaders(res, 'POST, OPTIONS');
+  apiHeaders(res, 'POST, OPTIONS', req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return sendError(res, 405, 'METHOD_NOT_ALLOWED', 'POST only', 'Send a POST request with JSON body {email, password}.');
 

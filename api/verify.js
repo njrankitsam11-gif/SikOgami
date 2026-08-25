@@ -5,7 +5,7 @@
 import { apiHeaders, sendError } from './lib/respond.js';
 
 export default async function handler(req, res) {
-  apiHeaders(res, 'POST, OPTIONS');
+  apiHeaders(res, 'POST, OPTIONS', req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   // Markdown negotiation: if agent asks for markdown, return markdown variant
   const accept = req.headers.accept || '';

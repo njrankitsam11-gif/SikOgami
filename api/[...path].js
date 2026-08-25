@@ -1,7 +1,7 @@
 import { apiHeaders, sendError } from './lib/respond.js';
 
 export default async function handler(req, res) {
-  apiHeaders(res, 'GET, POST, OPTIONS');
+  apiHeaders(res, 'GET, POST, OPTIONS', req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   return sendError(
     res,

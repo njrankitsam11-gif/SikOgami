@@ -6,33 +6,77 @@
       "destination": "/api/:path*"
     },
     {
+      "source": "/.well-known/mcp",
+      "destination": "/api/mcp"
+    },
+    {
+      "source": "/.well-known/mcp.json",
+      "destination": "/api/mcp"
+    },
+    {
       "source": "/",
-      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*text/markdown.*"
+        }
+      ],
       "destination": "/llms.txt"
     },
     {
       "source": "/about",
-      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*text/markdown.*"
+        }
+      ],
       "destination": "/about.md"
     },
     {
       "source": "/contact",
-      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*text/markdown.*"
+        }
+      ],
       "destination": "/contact.md"
     },
     {
       "source": "/privacy",
-      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*text/markdown.*"
+        }
+      ],
       "destination": "/privacy.md"
     },
     {
       "source": "/faq",
-      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*text/markdown.*"
+        }
+      ],
       "destination": "/faq.md"
     },
     {
       "source": "/docs",
-      "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*text/markdown.*"
+        }
+      ],
       "destination": "/docs/index.html"
     }
   ],
@@ -40,38 +84,131 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Vary", "value": "Accept, Accept-Encoding" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" }
+        {
+          "key": "Vary",
+          "value": "Accept, Accept-Encoding"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
       ]
     },
     {
       "source": "/llms.txt",
-      "headers": [{ "key": "Content-Type", "value": "text/markdown; charset=utf-8" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/markdown; charset=utf-8"
+        }
+      ]
     },
     {
       "source": "/sitemap.xml",
-      "headers": [{ "key": "Content-Type", "value": "application/xml" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        }
+      ]
     },
     {
       "source": "/openapi.json",
-      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
     },
     {
       "source": "/(.*).md",
-      "headers": [{ "key": "Content-Type", "value": "text/markdown; charset=utf-8" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/markdown; charset=utf-8"
+        }
+      ]
     },
     {
       "source": "/.well-known/mcp",
-      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
     },
     {
       "source": "/.well-known/mcp.json",
-      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Sunset",
+          "value": "Sat, 01 Mar 2027 00:00:00 GMT"
+        },
+        {
+          "key": "Deprecation",
+          "value": "false"
+        },
+        {
+          "key": "API-Version",
+          "value": "v1"
+        },
+        {
+          "key": "Link",
+          "value": "<https://sikogami.vercel.app/CHANGELOG.md>; rel=\"sunset\"; type=\"text/html\""
+        }
+      ]
+    },
+    {
+      "source": "/api/v1/(.*)",
+      "headers": [
+        {
+          "key": "Sunset",
+          "value": "Sat, 01 Mar 2027 00:00:00 GMT"
+        },
+        {
+          "key": "Deprecation",
+          "value": "false"
+        },
+        {
+          "key": "API-Version",
+          "value": "v1"
+        },
+        {
+          "key": "Link",
+          "value": "<https://sikogami.vercel.app/CHANGELOG.md>; rel=\"sunset\"; type=\"text/html\""
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Link",
+          "value": "<https://sikogami.vercel.app/openapi.json>; rel=\"describedby\"; type=\"application/json\""
+        }
+      ]
     }
   ],
   "functions": {
-    "api/verify.js": { "maxDuration": 10 },
-    "api/progress.js": { "maxDuration": 10 },
-    "api/mcp.js": { "maxDuration": 5 }
+    "api/verify.js": {
+      "maxDuration": 10
+    },
+    "api/progress.js": {
+      "maxDuration": 10
+    },
+    "api/mcp.js": {
+      "maxDuration": 5
+    }
   }
 }

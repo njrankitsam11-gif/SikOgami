@@ -1,5 +1,11 @@
 # CHANGELOG — SikOgami
 
+## 2.3.0 — 2026-08-25 — 99→100 hardening: MCP handshake, Sunset, OpenAPI descriptions
+- MCP: Streamable HTTP handshake at /.well-known/mcp (JSON-RPC initialize/tools/list/call, SSE) — vercel.json rewrites /.well-known/mcp → /api/mcp
+- Versioning: Sunset Sat, 01 Mar 2027 + Deprecation + Link rel="sunset" + API-Version v1 on all /api/* responses
+- OpenAPI: description + tags on all 9 operations, absolute https://sikogami.vercel.app/openapi.json, components.headers Sunset/Deprecation
+- HTML: Link rel="alternate" for openapi (application/vnd.oai.openapi+json) and llms.txt
+
 ## 2.2.0 — 2026-08-25 — Agentic API hardening
 - URL path versioning: canonical /api/v1/* (legacy /api/* kept as aliases)
 - Structured JSON errors on every 4xx/5xx: {ok:false, error, code, message, hint, status, docs}

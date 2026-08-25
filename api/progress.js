@@ -2,7 +2,7 @@ import { getSql, ensureUsersTable, ensureProgressTable } from './lib/db.js';
 import { apiHeaders, sendError, sendOk } from './lib/respond.js';
 
 export default async function handler(req, res) {
-  apiHeaders(res, 'GET, POST, OPTIONS');
+  apiHeaders(res, 'GET, POST, OPTIONS', req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   // Markdown negotiation: if agent asks for markdown, return markdown variant
   const accept = req.headers.accept || '';
