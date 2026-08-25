@@ -54,8 +54,10 @@ export default async function handler(req, res) {
     return res.status(200).json({
       name: "SikOgami MCP",
       version: "2.1.0",
+      description: "SikOgami Model Context Protocol server — tools for origami verification and progress. Use Streamable HTTP transport.",
       transport: { type: "streamable-http", url: "https://sikogami.vercel.app/api/mcp" },
-      tools: TOOL_DEFS.map(t=>t.name),
+      tools: TOOL_DEFS,
+      provider: { name:"SikOgami", url:"https://sikogami.vercel.app" },
       capabilities: { tools: {} },
       serverInfo: { name:"SikOgami MCP", version:"2.1.0" }
     });
