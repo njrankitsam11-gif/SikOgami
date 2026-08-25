@@ -1,6 +1,7 @@
+import { apiHeaders, sendError } from './lib/respond.js';
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Vary', 'Accept, Accept-Encoding');
+  apiHeaders(res, 'GET, POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method === 'GET') {
     return res.status(200).json({
@@ -50,5 +51,5 @@ export default async function handler(req, res) {
     }
     return res.status(200).json({ ok: true, echo: body, tools: ["verifyOrigami","getProgress","listLevels"] });
   }
-  return res.status(405).json({ error: "Method not allowed" });
+  return sendError(res, 405, 'METHOD_NOT_ALLOWED', 'Method not allowed', 'Use GET for the MCP manifest or POST to call a tool (listLevels, verifyOrigami, getProgress).');
 }

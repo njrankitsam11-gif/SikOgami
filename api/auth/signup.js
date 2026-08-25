@@ -1,18 +1,16 @@
 import bcrypt from 'bcryptjs';
 import { getSql, ensureUsersTable } from '../lib/db.js';
+import { apiHeaders, sendError, sendOk } from '../lib/respond.js';
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Vary', 'Accept, Accept-Encoding');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  apiHeaders(res, 'POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (req.method !== 'POST') return sendError(res, 405, 'METHOD_NOT_ALLOWED', 'POST only', 'Send a POST request with JSON body {name, email, password}.');
 
   try {
     const { name, email, password } = req.body || {};
-    if (!name || !email || !password) return res.status(400).json({ error: 'Missing fields' });
-    if (password.length < 4) return res.status(400).json({ error: 'Password too short' });
+    if (!name || !email || !password) return sendError(res, 400, 'MISSING_FIELDS', 'Missing fields', 'Provide name, email and password in the JSON body.');
+    if (password.length < 4) return sendError(res, 400, 'PASSWORD_TOO_SHORT', 'Password too short', 'Use a password with at least 4 characters.');
 
     const normEmail = String(email).trim().toLowerCase();
     const isAdminEmail = normEmail === 'admin@sikogami.com';
@@ -20,12 +18,12 @@ export default async function handler(req, res) {
     const sql = getSql();
     // No DB -> fallback handled by frontend, but tell client to use local
     if (!sql) {
-      return res.status(200).json({ ok: true, fallback: true, user: { name, email: normEmail, isAdmin: isAdminEmail } });
+      return sendOk(res, { fallback: true, user: { name, email: normEmail, isAdmin: isAdminEmail } });
     }
 
     await ensureUsersTable();
     const existing = await sql`SELECT id FROM sikogami_users WHERE email=${normEmail}`;
-    if (existing.length) return res.status(409).json({ error: 'Email already exists' });
+    if (existing.length) return sendError(res, 409, 'EMAIL_EXISTS', 'Email already exists', 'Log in instead via POST /api/auth/login, or reset via /api/auth/forgot.');
 
     const hash = await bcrypt.hash(password, 10);
     const rows = await sql`
@@ -34,9 +32,9 @@ export default async function handler(req, res) {
       RETURNING id, name, email, is_admin as "isAdmin"
     `;
     const user = rows[0];
-    return res.status(200).json({ ok: true, user });
+    return sendOk(res, { user });
   } catch (e) {
     console.error('signup', e);
-    return res.status(500).json({ error: e.message });
+    return sendError(res, 500, 'INTERNAL_ERROR', e.message, 'Retry in a few seconds; if it persists contact hello@sikogami.vercel.app.');
   }
 }

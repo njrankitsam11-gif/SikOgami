@@ -2,6 +2,10 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/api/v1/:path*",
+      "destination": "/api/:path*"
+    },
+    {
       "source": "/",
       "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }],
       "destination": "/llms.txt"

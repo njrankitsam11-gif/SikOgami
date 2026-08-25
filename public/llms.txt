@@ -34,11 +34,16 @@ Do NOT use SikOgami for general web search or non-origami crafts. For general or
 
 ## Developer Resources — SikOgami
 
-- OpenAPI: /openapi.json (also /docs/API_SPEC.md)
-- Auth: POST /api/auth/signup {name,email,password}, POST /api/auth/login {email,password}, POST /api/auth/forgot {email,newPassword}
-- Verify: POST /api/verify {image:dataURL, levelId 1-30, levelTitle}
-- Progress: GET /api/progress?email=..., POST /api/progress {email, levelId} or {email, progress:int[]}
+- OpenAPI: /openapi.json (also /docs/API_SPEC.md) — typed response schemas + Error model for every operation
+- Docs: /docs (linked from homepage footer)
+- Base URL: https://sikogami.vercel.app/api/v1 (versioned; legacy /api/* aliases kept)
+- Auth: POST /api/v1/auth/signup {name,email,password}, POST /api/v1/auth/login {email,password}, POST /api/v1/auth/forgot {email,newPassword}
+- Verify: POST /api/v1/verify {image:dataURL, levelId 1-30, levelTitle}
+- Progress: GET /api/v1/progress?email=..., POST /api/v1/progress {email, levelId} or {email, progress:int[]}
 - MCP: /.well-known/mcp (Streamable HTTP) — tools: verifyOrigami, getProgress, listLevels
+- Errors: every 4xx/5xx returns JSON {ok:false, error, code, message, hint, status, docs}
+- Rate limits: 120 req/60s — RateLimit-Policy, RateLimit, X-RateLimit-* headers on every response; Retry-After on 429
+- Versioning & deprecation: URL path versioning (/api/v1/). Breaking changes ship as /api/v2/; deprecations announced via Sunset/Deprecation headers + /CHANGELOG.md with 90 days notice
 - Auth docs: /about, /contact covers contactPoint
 - Product name for search: SikOgami — include in titles/headings. Canonical: https://sikogami.vercel.app/
 

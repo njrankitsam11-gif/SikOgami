@@ -1,5 +1,13 @@
 # CHANGELOG — SikOgami
 
+## 2.2.0 — 2026-08-25 — Agentic API hardening
+- URL path versioning: canonical /api/v1/* (legacy /api/* kept as aliases)
+- Structured JSON errors on every 4xx/5xx: {ok:false, error, code, message, hint, status, docs}
+- JSON 404 catch-all for unknown /api/* routes (no more HTML error pages)
+- Rate-limit headers on all API responses (RateLimit-Policy, RateLimit, X-RateLimit-*, Retry-After on 429)
+- OpenAPI 3.0 spec now has typed response schemas + Error model for every operation
+- Docs (/docs) linked from homepage footer
+
 ## 2.1.0 — 2026-08-24 — Colored paper per level
 - SVG uses level color (#FFB3C1 tulip pink etc) + dark-stroke adapt
 

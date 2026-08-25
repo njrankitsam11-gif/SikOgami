@@ -1,6 +1,24 @@
 # API_SPEC.md — SikOgami Serverless API
 > Sub-spec of `SPEC.md` §9. Update when any `api/*.js` changes.
 > Base: `https://sikogami.vercel.app`
+> Machine-readable spec: `/openapi.json` (typed response schemas + Error model)
+
+## Versioning
+- Canonical base: `/api/v1/*` (URL path versioning). Legacy `/api/*` paths remain as aliases.
+- Breaking changes ship as a new path version (`/api/v2/*`).
+- Deprecations are announced in `/CHANGELOG.md` and signalled with `Sunset`/`Deprecation` response headers at least 90 days before removal.
+
+## Errors
+Every 4xx/5xx response returns structured JSON:
+`{ok:false, error, code, message, hint, status, docs}`
+- `code` is machine-readable (e.g. `MISSING_FIELDS`, `INVALID_CREDENTIALS`, `EMAIL_EXISTS`, `USER_NOT_FOUND`, `INVALID_LEVEL`, `ROUTE_NOT_FOUND`, `METHOD_NOT_ALLOWED`, `INTERNAL_ERROR`).
+- `hint` tells the caller how to fix the request.
+- Unknown `/api/*` routes return a JSON 404 (`ROUTE_NOT_FOUND`), never HTML.
+
+## Rate limits
+120 requests / 60 seconds per client. Every API response carries:
+`RateLimit-Policy`, `RateLimit`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`.
+429 responses include `Retry-After`.
 
 ## Auth
 ### POST /api/auth/signup
@@ -47,6 +65,8 @@ File: `api/progress.js:1`
 
 ## Lib
 `api/lib/db.js:1` getSql() neon(DATABASE_URL), ensureUsersTable(), ensureProgressTable() + admin seed bcrypt10
+`api/lib/respond.js:1` apiHeaders() CORS+Vary+RateLimit headers, sendError() structured JSON errors, sendOk()
+`api/[...path].js:1` catch-all → JSON 404 ROUTE_NOT_FOUND for unknown /api/* routes
 
 ## Testing
 curl -s -X POST https://sikogami.vercel.app/api/auth/login -H "Content-Type: application/json" -d '{"email":"admin@sikogami.com","password":"admin123"}'

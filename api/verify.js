@@ -2,13 +2,10 @@
 // POST { image: "data:image/jpeg;base64,...", levelId: 1, levelTitle: "PAPER BOAT" }
 // Requires env GEMINI_API_KEY (get from aistudio.google.com)
 // Fallback: mock mode if no key -> always passes with 88% for demo
+import { apiHeaders, sendError } from './lib/respond.js';
 
 export default async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Vary', 'Accept, Accept-Encoding');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  apiHeaders(res, 'POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
   // Markdown negotiation: if agent asks for markdown, return markdown variant
   const accept = req.headers.accept || '';
@@ -17,11 +14,11 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
     return res.status(200).send(`# SikOgami API\n\nEndpoint: ${req.url}\nSee /openapi.json for JSON usage.`);
   }
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (req.method !== 'POST') return sendError(res, 405, 'METHOD_NOT_ALLOWED', 'POST only', 'Send a POST request with JSON body {image, levelId, levelTitle}.');
 
   try {
     const { image, levelId, levelTitle } = req.body;
-    if (!image) return res.status(400).json({ error: 'No image provided' });
+    if (!image) return sendError(res, 400, 'MISSING_IMAGE', 'No image provided', 'Include image as a data:image/jpeg;base64,... string plus levelId (1-30).');
 
     const apiKey = process.env.GEMINI_API_KEY;
     const target = levelTitle || `LEVEL ${levelId}`;

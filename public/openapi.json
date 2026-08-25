@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SikOgami API",
-    "description": "SikOgami \u2014 Fold. Breathe. Level Up. 30-level zen origami with Gemini Vision scan verification. Developer resources for SikOgami.",
+    "description": "SikOgami — Fold. Breathe. Level Up. 30-level zen origami with Gemini Vision scan verification. Developer resources for SikOgami.\n\nVersioning: this API uses URL path versioning (/api/v1/...). The legacy unversioned /api/* paths remain as aliases. Breaking changes get a new path version (/api/v2/...); deprecations are announced in /CHANGELOG.md and signalled with Sunset and Deprecation response headers at least 90 days before removal.\n\nRate limits: 120 requests per 60 seconds per client. Responses include RateLimit-Policy, RateLimit, X-RateLimit-Limit, X-RateLimit-Remaining and X-RateLimit-Reset headers; 429 responses include Retry-After.\n\nErrors: every 4xx/5xx response returns the typed Error schema (ok:false, code, message, hint, status).",
     "version": "2.1.0",
     "contact": {
       "name": "SikOgami",
@@ -17,32 +17,21 @@
     }
   ],
   "paths": {
-    "/api/auth/signup": {
+    "/api/v1/auth/signup": {
       "post": {
         "summary": "SikOgami signup",
+        "operationId": "signup",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "email",
-                  "password"
-                ],
+                "required": ["name", "email", "password"],
                 "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "minLength": 4
-                  }
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 4 }
                 }
               }
             }
@@ -50,34 +39,46 @@
         },
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "Account created (or local fallback when no DB is linked)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthResponse" } } }
+          },
+          "400": {
+            "description": "Missing fields or password too short",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
           },
           "409": {
-            "description": "exists"
+            "description": "Email already exists",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
           }
         }
       }
     },
-    "/api/auth/login": {
+    "/api/v1/auth/login": {
       "post": {
         "summary": "SikOgami login",
+        "operationId": "login",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "email",
-                  "password"
-                ],
+                "required": ["email", "password"],
                 "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  }
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
                 }
               }
             }
@@ -85,32 +86,46 @@
         },
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "Login succeeded (or local fallback when no DB is linked)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthResponse" } } }
+          },
+          "400": {
+            "description": "Missing fields",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "401": {
+            "description": "Wrong email or password",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
           }
         }
       }
     },
-    "/api/auth/forgot": {
+    "/api/v1/auth/forgot": {
       "post": {
         "summary": "SikOgami forgot password",
+        "operationId": "forgotPassword",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "email",
-                  "newPassword"
-                ],
+                "required": ["email", "newPassword"],
                 "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "newPassword": {
-                    "type": "string",
-                    "minLength": 4
-                  }
+                  "email": { "type": "string", "format": "email" },
+                  "newPassword": { "type": "string", "minLength": 4 }
                 }
               }
             }
@@ -118,24 +133,43 @@
         },
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "Password reset (or local fallback when no DB is linked)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MessageResponse" } } }
+          },
+          "400": {
+            "description": "Missing fields or password too short",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "404": {
+            "description": "No account with that email",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
           }
         }
       }
     },
-    "/api/verify": {
+    "/api/v1/verify": {
       "post": {
         "summary": "SikOgami verify origami photo",
+        "operationId": "verifyOrigami",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "image",
-                  "levelId"
-                ],
+                "required": ["image", "levelId"],
                 "properties": {
                   "image": {
                     "type": "string",
@@ -156,53 +190,71 @@
         },
         "responses": {
           "200": {
-            "description": "always 200 with pass/score"
+            "description": "Always 200 with pass/score (mock, gemini or fallback mode)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VerifyResponse" } } }
+          },
+          "400": {
+            "description": "Missing image",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
           }
         }
       }
     },
-    "/api/progress": {
+    "/api/v1/progress": {
       "get": {
         "summary": "Get SikOgami progress",
+        "operationId": "getProgress",
         "parameters": [
           {
             "name": "email",
             "in": "query",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string", "format": "email" }
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "Completed level ids for the user",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProgressResponse" } } }
+          },
+          "400": {
+            "description": "email required",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
           }
         }
       },
       "post": {
         "summary": "Sync SikOgami progress",
+        "operationId": "syncProgress",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "email"
-                ],
+                "required": ["email"],
                 "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "levelId": {
-                    "type": "integer"
-                  },
+                  "email": { "type": "string", "format": "email" },
+                  "levelId": { "type": "integer", "minimum": 1, "maximum": 30 },
                   "progress": {
                     "type": "array",
-                    "items": {
-                      "type": "integer"
-                    }
+                    "items": { "type": "integer", "minimum": 1, "maximum": 30 }
                   }
                 }
               }
@@ -211,7 +263,81 @@
         },
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "Updated progress after sync",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProgressResponse" } } }
+          },
+          "400": {
+            "description": "Missing email, invalid levelId, or missing payload",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "404": {
+            "description": "User not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/mcp": {
+      "get": {
+        "summary": "SikOgami MCP server info",
+        "operationId": "mcpInfo",
+        "responses": {
+          "200": {
+            "description": "MCP server manifest",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/McpManifest" } } }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      },
+      "post": {
+        "summary": "Call a SikOgami MCP tool",
+        "operationId": "mcpCall",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tool": { "type": "string", "enum": ["verifyOrigami", "getProgress", "listLevels"] },
+                  "method": { "type": "string" },
+                  "name": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tool result (listLevels returns all 30 levels)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/McpToolResponse" } } }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
           }
         }
       }
@@ -219,9 +345,131 @@
     "/.well-known/mcp": {
       "get": {
         "summary": "SikOgami MCP manifest",
+        "operationId": "mcpManifest",
         "responses": {
           "200": {
-            "description": "mcp"
+            "description": "MCP manifest (Streamable HTTP)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/McpManifest" } } }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "description": "Typed error returned for every 4xx and 5xx response",
+        "required": ["ok", "error", "code", "message", "status"],
+        "properties": {
+          "ok": { "type": "boolean", "enum": [false] },
+          "error": { "type": "string", "description": "Human-readable error summary" },
+          "code": { "type": "string", "description": "Machine-readable error code", "example": "MISSING_FIELDS" },
+          "message": { "type": "string", "description": "Human-readable message" },
+          "hint": { "type": "string", "description": "Resolution hint for the caller" },
+          "status": { "type": "integer", "description": "HTTP status code", "example": 400 },
+          "docs": { "type": "string", "format": "uri", "description": "Link to API documentation" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "isAdmin": { "type": "boolean" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": {
+          "ok": { "type": "boolean", "enum": [true] },
+          "fallback": { "type": "boolean", "description": "True when no database is linked and the client should use local storage" },
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": {
+          "ok": { "type": "boolean", "enum": [true] },
+          "fallback": { "type": "boolean" },
+          "message": { "type": "string" }
+        }
+      },
+      "ProgressResponse": {
+        "type": "object",
+        "required": ["ok", "progress"],
+        "properties": {
+          "ok": { "type": "boolean", "enum": [true] },
+          "fallback": { "type": "boolean" },
+          "progress": {
+            "type": "array",
+            "description": "Completed level ids (1-30)",
+            "items": { "type": "integer", "minimum": 1, "maximum": 30 }
+          }
+        }
+      },
+      "VerifyResponse": {
+        "type": "object",
+        "required": ["pass", "score"],
+        "properties": {
+          "pass": { "type": "boolean" },
+          "score": { "type": "integer", "minimum": 0, "maximum": 99 },
+          "feedback": { "type": "string" },
+          "mode": { "type": "string", "enum": ["gemini", "mock", "fallback", "error-fallback"] },
+          "expected": { "type": "string", "description": "Description of the expected origami model" }
+        }
+      },
+      "McpManifest": {
+        "type": "object",
+        "required": ["name", "version", "transport", "tools"],
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "transport": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["streamable-http"] },
+              "url": { "type": "string", "format": "uri" }
+            }
+          },
+          "tools": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "Level": {
+        "type": "object",
+        "required": ["id", "title"],
+        "properties": {
+          "id": { "type": "integer", "minimum": 1, "maximum": 30 },
+          "title": { "type": "string" },
+          "world": { "type": "string" },
+          "sheets": { "type": "integer" },
+          "emoji": { "type": "string" }
+        }
+      },
+      "McpToolResponse": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": {
+          "ok": { "type": "boolean", "enum": [true] },
+          "levels": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Level" }
+          },
+          "count": { "type": "integer" },
+          "echo": { "type": "object" },
+          "tools": {
+            "type": "array",
+            "items": { "type": "string" }
           }
         }
       }
