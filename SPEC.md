@@ -1,7 +1,7 @@
 # SikOgami — SPEC.md (Agent Source of Truth)
 > **Read this first every session. Update after each module/feature.**
 > Location: `/Users/sam/Desktop/SikOgami/SPEC.md`
-> Last Updated: 2026-09-02 | Version: 2.3.1 | Deployment: https://sikogami.vercel.app
+> Last Updated: 2026-09-02 | Version: 2.3.2 | Deployment: https://sikogami.vercel.app
 
 ## 0. Agent Instructions
 - **At session start:** Read `SPEC.md` + `docs/API_SPEC.md` + `docs/DB_SPEC.md` before any code. (Claude Code sessions: `CLAUDE.md` auto-loads and points here — if it's missing, read this file manually first.)
@@ -82,7 +82,7 @@ index.html (SPA shell, Tailwind CDN)
 ## 6. Deployment
 - **Vercel Project:** `prj_HSyIuYrOnkWhE57H6PzSzQ7cPQSX`, org `team_7ELib4M21slH5ZUg6Hew90EM`, name `sikogami`
 - **URLs:** Prod alias `https://sikogami.vercel.app`, preview `https://sikogami-<hash>-njrankitsam11-7734s-projects.vercel.app`, inspector `vercel.com/njrankitsam11-7734s-projects/sikogami/...`
-- **Neon Project:** `sikogami` (Admin org `njrankitsam11@gmail.com` Free), region `AWS US East 2 (Ohio)`, branch `production` Default, compute `.25 -> 2 CU`, storage/history 5GB. Connection string pooled `postgresql://neondb_owner:npg_x6fuNG0RqrhM@ep-silent-hill-ayo5xgn2-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require` → `DATABASE_URL` Sensitive Prod.
+- **Neon Project:** `sikogami` (Admin org `njrankitsam11@gmail.com` Free), region `AWS US East 2 (Ohio)`, branch `production` Default, compute `.25 -> 2 CU`, storage/history 5GB. Connection string pooled `postgresql://<redacted — set via Vercel env var, never commit credentials>` → `DATABASE_URL` Sensitive Prod.
 - **Deploy:** `vercel --prod --yes` (no build). Restore cache. Each feature commit → redeploy. Env add: `printf "URL" | vercel env add DATABASE_URL production`.
 
 ## 7. Environment Variables
@@ -164,6 +164,7 @@ Client mirror: `sikogami_progress` sorted int[]; `is_admin` drives admin unlock.
 - **Done (v2.2.0-2.3.1, agentic/AI-discoverability hardening):** `/api/v1` URL versioning w/ legacy aliases, structured JSON errors on every 4xx/5xx, JSON (never HTML) 404 catch-all for unknown API routes, rate-limit headers on every response, typed OpenAPI 3.0 spec w/ Error model, MCP server (`api/mcp.js`) with JSON-RPC 2.0 handshake (`initialize`/`tools/list`/`tools/call`/`ping`) + SSE support, `llms.txt`/`sitemap.xml`/`robots.txt`/`docs/` pages, markdown content negotiation via `middleware.js`, `/docs` linked from homepage footer. See §17-18.
 - **Pending:** Real Shopify store, video per step, QR sync desktop→phone, brand collab, analytics, JWT session, email verification, progress per-world completion badges, admin panel to unlock user, sound audio files, per-client (not just headers) rate limiting.
 - **Debt:**
+  - **[RESOLVED — was CRITICAL] Leaked DB credential:** `SPEC.md` §6 and `docs/DB_SPEC.md` embedded the full plaintext Neon `DATABASE_URL` (including password) from `a5897a8` (2026-08-22) until this fix (2026-09-02) — ~11 days. It was live on the public internet via `public/SPEC.md`/`public/docs/DB_SPEC.md` (this repo has no auth wall) *and* in this GitHub repo's public commit history (repo visibility: public). Redacted from all four files in v2.3.2. **The credential must still be rotated in the Neon console and `DATABASE_URL` updated in Vercel** — redacting the current file does not undo the exposure or purge git history; only rotation neutralizes it. Lesson: never paste a live connection string/secret into any doc, even one that looks internal-only — this repo mirrors everything to `public/` and serves it unauthenticated.
   - `progress` local global not per-user until login merge is explicit; `api/verify` fallback always pass may be too generous.
   - Rate-limit headers are advisory only — `api/lib/respond.js:apiHeaders()` always reports `remaining=limit-1`; no actual request counter/store enforces the 120/60s policy yet.
   - **`public/` mirror:** `index.html`, `app.js`, `style.css`, `SPEC.md`, `AGENT_GUIDE.md`, `docs/*` are duplicated byte-for-byte under `public/` with no build step or symlink to keep them in sync — every edit to a root copy must be manually repeated in `public/`. A past session shipped a doc change without doing this and needed a follow-up fix commit (`f5c9afc`). Prefer collapsing this to a real build step or symlinks if it causes another miss.
@@ -171,6 +172,7 @@ Client mirror: `sikogami_progress` sorted int[]; `is_admin` drives admin unlock.
   - `api/mcp/route.js` is a superseded stub (Next.js-route-handler-style GET/POST) left over from an earlier MCP attempt; `api/mcp.js` (Vercel Node function style) is the live implementation wired in `vercel.json`. Safe to delete once confirmed unused by any deploy path.
 
 ## 14. Changelog (Update After Each Feature)
+- **2026-09-02 v2.3.2:** **Security:** redacted the plaintext Neon `DATABASE_URL` (had been committed + publicly served for ~11 days, see §13 Debt) from `SPEC.md` and `docs/DB_SPEC.md` (+ `public/` mirrors) — rotation still required by the project owner. **Performance:** `ensureUsersTable()`/`ensureProgressTable()` memoized per warm instance instead of re-running on every request (`api/lib/db.js`); `api/progress.js` bulk sync batched into one `INSERT ... unnest()` instead of one `INSERT` per level. Indexing audited — no missing indexes for current query patterns (both tables' every WHERE-clause column already indexed); noted `idx_progress_user` as a now-redundant duplicate of the composite unique index (optional cleanup).
 - **2026-08-25 v2.3.1:** Fixed `api/index.js` returning HTML 404 for bare `/api` (catch-all missed the base path — `1e72372`); removed stale static `/.well-known/mcp` files so the `vercel.json` rewrite to `/api/mcp` actually serves the live Streamable HTTP handler + detailed GET manifest (`1fe3886`).
 - **2026-08-25 v2.3.0 "99→100":** MCP server hardened — Streamable HTTP handshake (`initialize`/`notifications/initialized`/`tools/list`/`tools/call`/`ping` over JSON-RPC 2.0, SSE when `Accept: text/event-stream`) at `/.well-known/mcp` → `/api/mcp`; `Sunset`/`Deprecation`/`API-Version`/`Link rel="sunset"` headers on all `/api/*` + `/api/v1/*`; OpenAPI descriptions/tags on all 9 operations; HTML `<link rel="alternate">` for openapi + llms.txt (`c430a35`).
 - **2026-08-25 v2.2.0:** Agentic API hardening — `/api/v1/*` canonical URL versioning (legacy `/api/*` aliases kept), structured JSON errors `{ok:false,error,code,message,hint,status,docs}` on every 4xx/5xx, JSON 404 catch-all for unknown `/api/*` routes (`api/index.js`, `api/[...path].js`), rate-limit headers on all responses, typed OpenAPI 3.0 response schemas + Error model, `/docs` linked from homepage footer (`27b4ab6`, synced to `public/` in `f5c9afc`).

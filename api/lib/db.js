@@ -8,7 +8,12 @@ export function getSql() {
   return sql;
 }
 
+// Memoized per warm Lambda instance — these tables/indexes/seed only ever need
+// to be created once; re-checking on every request wastes a network round-trip
+// per call against the HTTP-based Neon driver (see SPEC.md §13 Debt).
+let usersTableEnsured = false;
 export async function ensureUsersTable() {
+  if (usersTableEnsured) return true;
   const s = getSql();
   if (!s) return false;
   await s`
@@ -29,10 +34,13 @@ export async function ensureUsersTable() {
     VALUES ('Admin', 'admin@sikogami.com', ${adminHash}, true)
     ON CONFLICT (email) DO NOTHING
   `;
+  usersTableEnsured = true;
   return true;
 }
 
+let progressTableEnsured = false;
 export async function ensureProgressTable() {
+  if (progressTableEnsured) return true;
   const s = getSql();
   if (!s) return false;
   await s`
@@ -45,5 +53,6 @@ export async function ensureProgressTable() {
     )
   `;
   await s`CREATE INDEX IF NOT EXISTS idx_progress_user ON sikogami_progress(user_id)`;
+  progressTableEnsured = true;
   return true;
 }
