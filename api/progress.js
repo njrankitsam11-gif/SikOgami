@@ -39,12 +39,12 @@ export default async function handler(req, res) {
 
       // bulk sync: if progress array provided, replace
       if (Array.isArray(progress)) {
-        // delete then insert all (simple sync)
+        // delete then insert all (simple sync) — one round-trip per statement
+        // instead of one per level (unnest binds the whole array at once)
         await sql`DELETE FROM sikogami_progress WHERE user_id=${userId}`;
-        for (const lid of progress) {
-          if (Number.isInteger(lid) && lid>=1 && lid<=30) {
-            await sql`INSERT INTO sikogami_progress (user_id, level_id) VALUES (${userId}, ${lid}) ON CONFLICT DO NOTHING`;
-          }
+        const validIds = [...new Set(progress.filter(lid => Number.isInteger(lid) && lid>=1 && lid<=30))];
+        if (validIds.length) {
+          await sql`INSERT INTO sikogami_progress (user_id, level_id) SELECT ${userId}, unnest(${validIds}::int[]) ON CONFLICT DO NOTHING`;
         }
         return sendOk(res, { progress });
       }
